@@ -11,9 +11,9 @@
   <nav class="flex justify-between items-center px-10 py-4 bg-transparent">
     <h1 class="text-4xl font-bold tracking-wide">SIMANTAP</h1>
     <ul class="flex space-x-6 font-medium">
-      <li><a href="#" class="hover:border-b-2 border-white">Beranda</a></li>
-      <li><a href="#" class="hover:border-b-2 border-white">Tentang Kami</a></li>
-      <li><a href="#" class="hover:border-b-2 border-white">Contact</a></li>
+      <li><a href="index.php" class="hover:border-b-2 border-white">Beranda</a></li>
+      <li><a href="tentang.php" class="hover:border-b-2 border-white">Tentang Kami</a></li>
+      <li><a href="contact.php" class="hover:border-b-2 border-white">Contact</a></li>
     </ul>
   </nav>
   <div class="flex flex-col md:flex-row items-center justify-between px-10 py-20 space-y-10 md:space-y-0">

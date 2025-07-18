@@ -19,11 +19,11 @@ include '../db.php';
        
         <div class="w-1/2 p-10 flex flex-col justify-center">
             <h2 class="text-2xl font-bold mb-8 text-black">LOGIN</h2>
-            <form action="login_process.php" method="post" class="space-y-5">
+            <form action="login_process.php" method="POST">
 
                 <div>
-                    <label for="username" class="block text-sm text-gray-700 mb-1">Username:</label>
-                    <input type="text" id="username" name="username" required 
+                    <label for="nama" class="block text-sm text-gray-700 mb-1">Username:</label>
+                    <input type="nama" id="nama" name="nama" required 
                         class="w-full px-4 py-2 rounded-md bg-[#dddddd] focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
 
@@ -32,6 +32,13 @@ include '../db.php';
                     <input type="password" id="password" name="password" required 
                         class="w-full px-4 py-2 rounded-md bg-[#dddddd] focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
+
+                <div>
+                    <label for="role" class="block text-sm text-gray-700 mb-1">Jabatan:</label>
+                    <input type="role" id="role" name="role" required 
+                        class="w-full px-4 py-2 rounded-md bg-[#dddddd] focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+
 
                 <div>
                     <button type="submit" 
