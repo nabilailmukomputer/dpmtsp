@@ -40,12 +40,11 @@ include '../db.php';
                 </div>
 
 
-                <div>
+
                     <button type="submit" 
                         class="w-full bg-[#003366] text-white py-2 rounded-md font-semibold hover:bg-[#002244] transition duration-300">
                         Login
                     </button>
-                </div>
             </form>
 
             <p class="mt-4 text-sm text-center text-black">

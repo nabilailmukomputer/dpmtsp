@@ -8,11 +8,14 @@
 <body class="bg-[#f5f5f5] min-h-screen font-sans">
 
   <nav class="bg-[#5C7CFA] py-4 px-8 flex items-center justify-between">
-    <div class="text-white font-bold text-xl tracking-wide">SIMANTAP</div>
+    <div class="flex items-center space-x-2">
+      <img src="assets/titik_tiga.png" alt="Logo" class="w-10 h-10"/>
+      <h1 class="text-2xl md:text-3xl font-bold text-white">SIMANTAP</h1>
+    </div>
     <div class="space-x-6">
       <a href="index.php" class="text-white hover:underline">Beranda</a>
       <a href="tentang.php" class="text-white hover:underline">Tentang Kami</a>
-      <a href="contact.php" class="text-white hover:underline">Contact</a>
+      <a href="contact.php" class="bg-[#1F2937] text-white px-4 py-1 rounded-full hover:bg-[#111827]">Contact</a>
     </div>
   </nav>
 
