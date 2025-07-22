@@ -18,6 +18,10 @@ if ($data) {
         header('Location:admin/dashboard.php');
     } elseif ($role == 'penanggung jawab') {
         header('Location:penanggungjawab/dashboard.php');
+    } elseif ($role == 'pengendali teknis') {
+        header('Location: pengendali teknis/dashboard.php');
+    } elseif ($role == 'ketua divisi') {
+        header('Location:ketua divisi/dashboard.php');
     } elseif ($role == 'pegawai') {
         header('Location: pegawai/dashboard.php');
     } else {
