@@ -29,16 +29,6 @@ include '../db.php';
 <input type="password" id="password" name="password" required 
     class="w-full px-4 py-2 rounded-md bg-[#dddddd] focus:outline-none focus:ring-2 focus:ring-blue-400">
 
-<label for="role" class="block text-sm text-gray-700 mb-1">Jabatan:</label>
-<select id="role" name="role" required
-    class="w-full px-4 py-2 rounded-md bg-[#dddddd] focus:outline-none focus:ring-2 focus:ring-blue-400">
-    <option value="admin">Admin</option>
-    <option value="penanggung jawab">Penanggung Jawab</option>
-    <option value="pengendali teknis">Pengendali Teknis</option>
-     <option value="ketua divisi">Ketua Divisi</option>
-    <option value="anggota">Anggota</option>
-</select>
-
 
 
                     <button type="submit" 
