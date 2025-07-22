@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,11 +35,11 @@
           
         <h2 class="text-sm font-bold text-gray-300 mb-2">MENU UNTUK ADMIN</h2>
         <ul class="space-y-2 text-sm">
-          <li><a href="tugas/detail_tugas.php" class="block py-1 hover:underline">Detail Tugas</a></li>
-          <li><a href="#" class="block py-1 hover:underline">Laporan Harian</a></li>
-          <li><a href="#" class="block py-1 hover:underline">Permohonan Tenggat</a></li>
-          <li><a href="#" class="block py-1 hover:underline">Kinerja Pegawai</a></li>
-          <li><a href="#" class="block py-1 hover:underline">Kelola Pengguna</a></li>
+          <li><a href="detail.php" class="block py-1 hover:underline">Detail Tugas</a></li>
+          <li><a href="laporan.php" class="block py-1 hover:underline">Laporan Harian</a></li>
+          <li><a href="tenggat.php" class="block py-1 hover:underline">Permohonan Tenggat</a></li>
+          <li><a href="kinerja_pegawai.php" class="block py-1 hover:underline">Kinerja Pegawai</a></li>
+          <li><a href="kelola_admin.php" class="block py-1 hover:underline">Kelola Pengguna</a></li>
         </ul>
       </nav>
     </aside>
