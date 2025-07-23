@@ -14,7 +14,7 @@
 <body class="bg-gradient-to-b from-[#5C6BC0] to-[#E0E9F5] min-h-screen text-white font-sans">
 
   <!-- Navbar -->
-  <nav class="flex justify-between items-center px-10 py-4 bg-transparent">
+  <nav class="flex justify-between items-center px-8 py-4 bg-transparent">
     <div class="flex items-center space-x-2">
       <img src="assets/titik_tiga.png" alt="Logo" class="w-10 h-10"/>
       <h1 class="text-2xl md:text-3xl font-bold text-white">SIMANTAP</h1>

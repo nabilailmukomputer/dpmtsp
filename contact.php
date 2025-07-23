@@ -6,18 +6,32 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#f5f5f5] min-h-screen font-sans">
-
- 
-  <nav class="bg-[#5C7CFA] py-4 px-8 flex items-center justify-between">
+  
+  <nav class="flex justify-between items-center px-8 py-4 bg-[#6B7EFF]">
     <div class="flex items-center space-x-2">
       <img src="assets/titik_tiga.png" alt="Logo" class="w-10 h-10"/>
       <h1 class="text-2xl md:text-3xl font-bold text-white">SIMANTAP</h1>
     </div>
-    <div class="space-x-6">
-      <a href="index.php" class="text-white hover:underline">Beranda</a>
-      <a href="tentang.php" class="text-white hover:underline">Tentang Kami</a>
-      <a href="contact.php" class="bg-[#1F2937] text-white px-4 py-1 rounded-full hover:bg-[#111827]">Contact</a>
-    </div>
+    <ul class="flex space-x-8 md:space-x-16 font-medium text-base md:text-lg">
+      <li>
+        <a href="index.php" class="relative group text-white">
+          Beranda
+          <span class="absolute left-0 bottom-[-4px] h-[2px] w-full bg-[#011527] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
+        </a>
+      </li>
+      <li>
+        <a href="tentang.php" class="relative group text-white">
+          Tentang Kami
+          <span class="absolute left-0 bottom-[-4px] h-[2px] w-full bg-[#011527] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
+        </a>
+      </li>
+      <li>
+        <a href="contact.php" class="bg-[#052748] hover:bg-[#011527] px-6 py-2 rounded-tl-[50px] rounded-tr-[50px]
+        rounded-br-[50px] rounded-bl-[0px]  text-white shadow-md transition">
+          Contact
+        </a>
+      </li>
+    </ul>
   </nav>
 
   <section class="px-4 md:px-20 py-12">
@@ -67,9 +81,10 @@
         </div>
         <p class="text-sm mt-1 text-gray-600">Dinas Penanaman Modal Terpadu Satu Patu</p>
       </div>
-      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.806465015981!2d114.36547397401372!3d-8.222208691810382!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd15acd3993c4ab%3A0x8850a5c15ca7fe91!2sDinas%20Penanaman%20dan%20Pelayanan%20Terpadu%20Satu%20Pintu%20Kabupaten%20Banyuwangi!5e0!3m2!1sen!2sid!4v1752815386871!5m2!1sen!2sid" width="850" height="350" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.806465015981!2d114.36547397401372!3d-8.222208691810382!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd15acd3993c4ab%3A0x8850a5c15ca7fe91!2sDinas%20Penanaman%20dan%20Pelayanan%20Terpadu%20Satu%20Pintu%20Kabupaten%20Banyuwangi!5e0!3m2!1sen!2sid!4v1752815386871!5m2!1sen!2sid" 
+          width="850" height="250" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         <p class="text-center text-sm text-blue-700 hover:underline cursor-pointer">LINK GOOGLE MAPS</p>
-    </div>
+      </div>
   </section>
 
 </body>
