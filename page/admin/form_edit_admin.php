@@ -27,7 +27,7 @@ if (isset($_POST['update'])) {
 <head>
     <nav class="bg-[#5C7CFA] py-4 px-8 flex items-center justify-between">
     <div class="flex items-center space-x-2">
-      <h1 class="text-2xl md:text-3xl font-bold text-white">Tambah Admin</h1>
+      <h1 class="text-2xl md:text-3xl font-bold text-white">Tambah User</h1>
     </div>
     <div class="space-x-6">
       <a href="dashboard.php" class="text-white hover:underline">Dashboard</a>
