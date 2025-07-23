@@ -15,7 +15,8 @@ if (isset($_POST['update'])) {
   $password = $_POST['password'];
   $role = $_POST['role'];
   $bidang = $_POST['bidang'];
-  mysqli_query($conn, "UPDATE user SET nama='$username', password='$password' , role='$role', bidang='$bidang' WHERE id=$id");
+  $NIP = $_POST['NIP'];
+  mysqli_query($conn, "UPDATE user SET nama='$username', password='$password' , role='$role', bidang='$bidang', NIP='$NIP' WHERE id=$id");
   header("Location: kelola_admin.php");
   exit;
 }
@@ -51,12 +52,11 @@ if (isset($_POST['update'])) {
                 <option value="ketua divisi">Ketua Divisi</option>
                 <option value="anggota">Anggota </option>
             </select>
-                <select name="bidang" required class="w-full mb-4 p-2 border rounded">
-                <option value="-">-</option>
-                <option value="penanaman modal">Penanaman Modal</option>
-                <option value="pelayanan">Pelayanan</option>
-                <option value="pengendali teknis">Kesekretariatan</option>
-            </select>
+             <label class="block mb-2">Bidang</label>
+    <input type="text" name="bidang" value="<?= htmlspecialchars($data['bidang']) ?>" required class="w-full mb-4 p-2 border rounded">
+               
+            <label class="block mb-2">NIP</label>
+    <input type="text" name="NIP" value="<?= htmlspecialchars($data['NIP']) ?>" required class="w-full mb-4 p-2 border rounded">
 
     <button type="submit" name="update" class="bg-blue-500 text-white px-4 py-2 rounded">Update</button>
     <a href="kelola_admin.php" class="ml-4 text-gray-600 hover:underline">Batal</a>

@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db   = "simantap1";
+$db   = "simantap";
 
 $conn = new mysqli($host, $user, $pass, $db);
 

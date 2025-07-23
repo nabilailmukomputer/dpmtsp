@@ -6,16 +6,17 @@ $nama = '';
 $password = '';
 $role = '';
 $bidang = '';
-
+$NIP ='';
 // Jika form disubmit
 if (isset($_POST['tambah'])) {
   $nama = $_POST['nama'];
   $password = $_POST['password'];
   $role = $_POST['role'];
   $bidang = $_POST['bidang'];
+  $NIP = $_POST['NIP'];
 
   // Simpan ke database
-  $query = "INSERT INTO user (nama, password, role, bidang) VALUES ('$nama', '$password', '$role', '$bidang')";
+  $query = "INSERT INTO user (nama, password, role, bidang,NIP) VALUES ('$nama', '$password', '$role', '$bidang','$NIP')";
   if (mysqli_query($conn, $query)) {
     header("Location: kelola_admin.php");
     exit;
@@ -57,13 +58,13 @@ if (isset($_POST['tambah'])) {
       <option value="anggota" <?= $role == 'anggota' ? 'selected' : '' ?>>Anggota</option>
     </select>
 
-    <label class="block mb-2">Bidang</label>
-    <select name="bidang" required class="w-full mb-4 p-2 border rounded">
-      <option value="-">-</option>
-      <option value="penanaman modal" <?= $bidang == 'penanaman modal' ? 'selected' : '' ?>>Penanaman Modal</option>
-      <option value="pelayanan" <?= $bidang == 'pelayanan' ? 'selected' : '' ?>>Pelayanan</option>
-      <option value="kesekretariatan" <?= $bidang == 'kesekretariatan' ? 'selected' : '' ?>>Kesekretariatan</option>
-    </select>
+     <label class="block mb-2">Bidang</label>
+    <input type="text" name="bidang" value="<?= htmlspecialchars($bidang) ?>" required class="w-full mb-4 p-2 border rounded">
+
+
+   
+    <label class="block mb-2">NIP</label>
+    <input type="text" name="NIP" value="<?= htmlspecialchars($NIP) ?>" required class="w-full mb-4 p-2 border rounded">
 
     <button type="submit" name="tambah" class="bg-green-500 text-white px-4 py-2 rounded">Simpan</button>
     <a href="kelola_admin.php" class="ml-4 text-gray-600 hover:underline">Kembali</a>

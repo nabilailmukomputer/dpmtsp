@@ -38,6 +38,7 @@ if (isset($_GET['hapus'])) {
         <th class="border px-4 py-2">Password</th>
         <th class="border px-4 py-2">role</th>
         <th class="border px-4 py-2">bidang</th>
+         <th class="border px-4 py-2">NIP</th>
         <th class="border px-4 py-2">Aksi</th>
       </tr>
     </thead>
@@ -53,6 +54,7 @@ if (isset($_GET['hapus'])) {
           <td class="border px-4 py-2"><?= $data['password'] ?></td>
           <td class="border px-4 py-2"><?= $data['role'] ?></td>
           <td class="border px-4 py-2"><?= $data['bidang'] ?></td>
+           <td class="border px-4 py-2"><?= $data['NIP'] ?></td>
           <td class="border px-4 py-2">
             <a href="form_edit_admin.php?id=<?= $data['id'] ?>" class="text-blue-600 hover:underline mr-2">Edit</a>
             <a href="?hapus=<?= $data['id'] ?>" onclick="return confirm('Yakin hapus admin ini?')" class="text-red-600 hover:underline">Hapus</a>

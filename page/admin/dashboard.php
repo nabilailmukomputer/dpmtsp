@@ -1,3 +1,22 @@
+<?php
+// Ambil koneksi database
+include '../../db.php';
+
+// Total semua tugas
+$result = mysqli_query($conn, "SELECT COUNT(*) AS status FROM task");
+$data = mysqli_fetch_assoc($result);
+$totalTugas = $data['status'];
+
+// Total tugas selesai
+$result = mysqli_query($conn, "SELECT COUNT(*) AS status FROM task WHERE status = 'selesai'");
+$data = mysqli_fetch_assoc($result);
+$Selesai = $data['status'];
+
+// Total tugas berlangsung
+$result = mysqli_query($conn, "SELECT COUNT(*) AS status FROM task WHERE status = 'dikerjakan'");
+$data = mysqli_fetch_assoc($result);
+$dikerjakan = $data['status'];
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -40,6 +59,7 @@
           <li><a href="tenggat.php" class="block py-1 hover:underline">Permohonan Tenggat</a></li>
           <li><a href="kinerja_pegawai.php" class="block py-1 hover:underline">Kinerja Pegawai</a></li>
           <li><a href="kelola_admin.php" class="block py-1 hover:underline">Kelola Pengguna</a></li>
+          <a href="../logout.php" class="text-red-500 hover:underline">Logout</a>
         </ul>
       </nav>
     </aside>
@@ -52,33 +72,31 @@
           <span class="material-icons text-black">menu_book</span>
           <h1 class="text-xl font-semibold">Dashboard - Admin</h1>
         </div>
+      
         <div class="flex items-center">
           <span class="mr-2 font-medium">Users</span>
           <img src="assets/lala/png" alt="User" class="w-8 h-8 rounded-full object-cover"/>
         </div>
       </div>
 
-      <!-- Kartu Status -->
-      <div class="grid grid-cols-4 gap-4 mt-6">
-        <div class="bg-blue-600 text-white p-4 rounded shadow">
-          <p class="text-sm">Total Tugas</p>
-          <p class="text-2xl font-bold">123</p>
-        </div>
-        <div class="bg-green-600 text-white p-4 rounded shadow">
-          <p class="text-sm">Tugas Selesai</p>
-          <p class="text-2xl font-bold">99</p>
-        </div>
-        <div class="bg-yellow-500 text-white p-4 rounded shadow">
-          <p class="text-sm">Tugas Berlangsung</p>
-          <p class="text-2xl font-bold">123</p>
-        </div>
-        <div class="bg-red-600 text-white p-4 rounded shadow">
-          <p class="text-sm">Tugas Terlambat</p>
-          <p class="text-2xl font-bold">0</p>
-        </div>
-      </div>
-    </main>
-  </div>
+      <!-- Total Tugas -->
+<div class="bg-blue-600 text-white p-2 rounded shadow-md">
+    <p class="text-lg">Total Tugas</p>
+    <h2 class="text-3xl font-bold"><?= $totalTugas ?></h2>
+</div>
+
+<!-- Tugas Selesai -->
+<div class="bg-green-600 text-white p-2 rounded shadow-md">
+    <p class="text-lg">Tugas Selesai</p>
+    <h2 class="text-3xl font-bold"><?= $Selesai ?></h2>
+</div>
+
+<!-- Tugas Berlangsung -->
+<div class="bg-yellow-500 text-white p-2 rounded shadow-md">
+    <p class="text-lg">Tugas Berlangsung</p>
+    <h2 class="text-3xl font-bold"><?= $dikerjakan ?></h2>
+</div>
+
 
 </body>
 </html>
