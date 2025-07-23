@@ -16,6 +16,11 @@ $Selesai = $data['status'];
 $result = mysqli_query($conn, "SELECT COUNT(*) AS status FROM task WHERE status = 'dikerjakan'");
 $data = mysqli_fetch_assoc($result);
 $dikerjakan = $data['status'];
+
+// total tugas terlambat 
+$result = mysqli_query($conn, "SELECT COUNT(*) AS status FROM task WHERE status = 'terlambat'");
+$data = mysqli_fetch_assoc($result);
+$terlambat = $data['status'];
 ?>
 
 <!DOCTYPE html>
@@ -83,35 +88,44 @@ $dikerjakan = $data['status'];
     <!-- Main Content -->
     <main class="flex-1 p-6">
       <!-- Header -->
-      <div class="flex justify-between items-center bg-gray-200 py-3 px-6 rounded-md">
+      <div class="flex justify-between items-center bg-gray-200 py-3 px-6 rounded-md" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(59,130,246,0.4);">
         <div class="flex items-center space-x-2">
+          
           <span class="material-icons text-black">menu_book</span>
           <h1 class="text-xl font-semibold">Dashboard - Admin</h1>
         </div>
       
         <div class="flex items-center">
           <span class="mr-2 font-medium">Users</span>
-          <img src="assets/lala/png" alt="User" class="w-8 h-8 rounded-full object-cover"/>
+          <img src="../assets/lala.jpeg" alt="User" class="w-8 h-8 rounded-full object-cover"/>
         </div>
       </div>
 
       <!-- Total Tugas -->
-<div class="bg-blue-600 text-white p-2 rounded shadow-md">
-    <p class="text-lg">Total Tugas</p>
-    <h2 class="text-3xl font-bold"><?= $totalTugas ?></h2>
-</div>
+<div class="grid grid-cols-2 md:grid-cols-2 gap-2">
+    <!-- Kotak 1 -->
+    <div class="bg-blue-600 text-white p-4 rounded shadow-lg mt-2 border border-gray-200" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(59,130,246,0.4);">
+        <p class="text-lg">Total Tugas</p>
+        <h2 class="text-xl font-bold"><?= $totalTugas ?></h2>
+    </div>
 
 <!-- Tugas Selesai -->
-<div class="bg-green-600 text-white p-2 rounded shadow-md">
+<div class="bg-green-600 text-white p-4 rounded shadow-lg mt-2 border border-gray-200" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(3, 104, 0, 0.4);">
     <p class="text-lg">Tugas Selesai</p>
-    <h2 class="text-3xl font-bold"><?= $Selesai ?></h2>
+    <h2 class="text-xl font-bold"><?= $Selesai ?></h2>
 </div>
 
 <!-- Tugas Berlangsung -->
-<div class="bg-yellow-500 text-white p-2 rounded shadow-md">
+<div class="bg-yellow-500 text-white p-4 rounded shadow-lg mt-2 border border-gray-200" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(246, 237, 59, 0.4);">
     <p class="text-lg">Tugas Berlangsung</p>
-    <h2 class="text-3xl font-bold"><?= $dikerjakan ?></h2>
+    <h2 class="text-xl font-bold"><?= $dikerjakan ?></h2>
 </div>
+
+<!-- Tugas Terlambat -->
+    <div class="bg-red-600 text-white p-4 rounded shadow-lg mt-2 border border-gray-200" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(246, 59, 59, 0.4);">
+        <p class="text-lg">Tugas Terlambat</p>
+        <h2 class="text-xl font-bold"><?= $terlambat ?></h2>
+    </div>
 
 
 </body>
