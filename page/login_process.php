@@ -38,4 +38,4 @@ if ($data) {
     echo "<script>alert('Login gagal! Periksa nama dan password.');window.location='login.php';</script>";
     exit;
 }
-?>
+
