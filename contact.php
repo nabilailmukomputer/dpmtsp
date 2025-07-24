@@ -45,7 +45,7 @@
   <!-- WhatsApp -->
   <div class="bg-gray-100 p-4 rounded-md shadow-sm w-full max-w-sm text-center">
     <div class="text-gray-700 font-semibold mb-2 flex justify-center items-center gap-2">
-      <img src="assets/telefon.png" class="w-5 h-5" alt="WhatsApp Icon">
+      <img src="assets/telefon_a.png" class="w-5 h-5" alt="WhatsApp Icon">
       WhatsApp
     </div>
     <p class="text-gray-500 text-sm">+12 3456 7891 011</p>
@@ -83,7 +83,7 @@
       </div>
         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.806465015981!2d114.36547397401372!3d-8.222208691810382!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd15acd3993c4ab%3A0x8850a5c15ca7fe91!2sDinas%20Penanaman%20dan%20Pelayanan%20Terpadu%20Satu%20Pintu%20Kabupaten%20Banyuwangi!5e0!3m2!1sen!2sid!4v1752815386871!5m2!1sen!2sid" 
           width="850" height="250" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        <p class="text-center text-sm text-blue-700 hover:underline cursor-pointer">LINK GOOGLE MAPS</p>
+        <p class="text-center text-sm text-blue-700 hover:underline cursor-pointer"> GOOGLE MAPS</p>
       </div>
   </section>
 

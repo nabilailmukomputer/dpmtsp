@@ -73,6 +73,9 @@ $terlambat = $data['status'];
           <li>
             <a href="kelola_admin.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola Pengguna</a>
           </li>
+          <li>
+            <a href="kelola_bidang.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola Bidang</a>
+          </li>
         </ul>
       </nav>
 
@@ -82,13 +85,12 @@ $terlambat = $data['status'];
           <span>Logout</span>
         </a>
       </div>
-
     </aside>
 
     <!-- Main Content -->
     <main class="flex-1 p-6">
       <!-- Header -->
-      <div class="flex justify-between items-center bg-gray-200 py-3 px-6 rounded-md" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(59,130,246,0.4);">
+      <div class="flex justify-between items-center bg-gray-200 py-3 px-6 rounded-md mb-5" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.05), 0 0 10px rgba(59,130,246,0.4);">
         <div class="flex items-center space-x-2">
           
           <span class="material-icons text-black">menu_book</span>
@@ -97,35 +99,39 @@ $terlambat = $data['status'];
       
         <div class="flex items-center">
           <span class="mr-2 font-medium">Users</span>
-          <img src="../assets/lala.jpeg" alt="User" class="w-8 h-8 rounded-full object-cover"/>
+          <img src="assets/lala.jpeg" alt="User" class="w-8 h-8 rounded-full object-cover"/>
         </div>
       </div>
 
-      <!-- Total Tugas -->
-<div class="grid grid-cols-2 md:grid-cols-2 gap-2">
-    <!-- Kotak 1 -->
-    <div class="bg-blue-600 text-white p-4 rounded shadow-lg mt-2 border border-gray-200" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(59,130,246,0.4);">
-        <p class="text-lg">Total Tugas</p>
-        <h2 class="text-xl font-bold"><?= $totalTugas ?></h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+    <!-- Total Tugas -->
+    <div class="bg-blue-600 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:scale-105 transition"
+         onclick="window.location.href='detail_tugas.php?status=all'">
+        <h2 class="text-lg font-semibold">Total Tugas</h2>
+        <p class="text-3xl font-bold mt-2">7</p>
     </div>
 
-<!-- Tugas Selesai -->
-<div class="bg-green-600 text-white p-4 rounded shadow-lg mt-2 border border-gray-200" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(3, 104, 0, 0.4);">
-    <p class="text-lg">Tugas Selesai</p>
-    <h2 class="text-xl font-bold"><?= $Selesai ?></h2>
-</div>
-
-<!-- Tugas Berlangsung -->
-<div class="bg-yellow-500 text-white p-4 rounded shadow-lg mt-2 border border-gray-200" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(246, 237, 59, 0.4);">
-    <p class="text-lg">Tugas Berlangsung</p>
-    <h2 class="text-xl font-bold"><?= $dikerjakan ?></h2>
-</div>
-
-<!-- Tugas Terlambat -->
-    <div class="bg-red-600 text-white p-4 rounded shadow-lg mt-2 border border-gray-200" style="box-shadow: 0 0 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(246, 59, 59, 0.4);">
-        <p class="text-lg">Tugas Terlambat</p>
-        <h2 class="text-xl font-bold"><?= $terlambat ?></h2>
+    <!-- Tugas Selesai -->
+    <div class="bg-green-600 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:scale-105 transition"
+         onclick="window.location.href='detail_tugas.php?status=selesai'">
+        <h2 class="text-lg font-semibold">Tugas Selesai</h2>
+        <p class="text-3xl font-bold mt-2">3</p>
     </div>
+
+    <!-- Tugas Berlangsung -->
+    <div class="bg-yellow-500 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:scale-105 transition"
+         onclick="window.location.href='detail_tugas.php?status=berlangsung'">
+        <h2 class="text-lg font-semibold">Tugas Berlangsung</h2>
+        <p class="text-3xl font-bold mt-2">2</p>
+    </div>
+
+    <!-- Tugas Terlambat -->
+    <div class="bg-red-600 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:scale-105 transition"
+         onclick="window.location.href='detail_tugas.php?status=terlambat'">
+        <h2 class="text-lg font-semibold">Tugas Terlambat</h2>
+        <p class="text-3xl font-bold mt-2">2</p>
+    </div>
+</div>
 
 
 </body>

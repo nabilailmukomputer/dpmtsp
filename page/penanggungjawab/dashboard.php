@@ -16,7 +16,7 @@
     .sidebar {
       width: 250px;
       background: #002244;
-      color: white;
+      color: white; 
       height: 100vh;
       padding: 20px;
       position: fixed;
@@ -151,7 +151,7 @@
   <div class="card-container">
     <!-- Kesekretariatan -->
     <div class="card">
-      <img src="img/kesekretariatan.jpg" alt="Kesekretariatan">
+      <img src="../../assets/images.png" alt="Kesekretariatan">
       <div class="card-title">Kesekretariatan</div>
       <div class="card-footer">
         <a href="kesekretariatan.php" class="lihat-btn">Lihat &gt;</a>
@@ -160,7 +160,7 @@
 
     <!-- Layanan -->
     <div class="card">
-      <img src="img/layanan.jpg" alt="Layanan">
+      <img src="../../assets/images.jpeg" alt="Layanan">
       <div class="card-title">Layanan</div>
       <div class="card-footer">
         <a href="layanan.php" class="lihat-btn">Lihat &gt;</a>
@@ -169,7 +169,7 @@
 
     <!-- Penanaman Modal -->
     <div class="card">
-      <img src="img/penanaman.jpg" alt="Penanaman Modal">
+      <img src="../../assets/lala.jpeg" alt="Penanaman Modal">
       <div class="card-title">Penanaman Modal</div>
       <div class="card-footer">
         <a href="penanaman.php" class="lihat-btn">Lihat &gt;</a>

@@ -14,111 +14,118 @@ $result = mysqli_query($conn, $query);
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Tugas</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-6">
-    <!-- Container Header -->
-    <div class="flex justify-between items-center bg-gray-200 p-4 rounded-lg mb-6">
-        <!-- Judul -->
-        <h1 class="text-2xl font-bold text-gray-800">Detail Tugas Pegawai</h1>
+<body class="bg-gray-100">
 
-        <!-- Search Form -->
-        <form action="search.php" method="GET" class="flex items-center bg-gray-800 rounded-lg px-3 py-2 w-72">
-            <input type="text" name="q" placeholder="Cari...." 
-                class="bg-gray-800 text-white placeholder-gray-400 w-full focus:outline-none" />
-            <button type="submit" class="text-gray-400 hover:text-white ml-2">🔍</button>
-        </form>
-    </div>
+<div class="p-6">
+    <h1 class="text-3xl font-bold mb-6">Detail Tugas Pegawai</h1>
+    <table class="min-w-full bg-white border rounded shadow-md">
+        <thead class="bg-gray-200 text-gray-600">
+            <tr>
+                <th class="py-3 px-4 border">Judul Tugas</th>
+                <th class="py-3 px-4 border">Deadline</th>
+                <th class="py-3 px-4 border">Tanggal Penugasan</th>
+                <th class="py-3 px-4 border">Pemberi</th>
+                <th class="py-3 px-4 border">Penerima</th>
+                <th class="py-3 px-4 border">Status</th>
+                <th class="py-3 px-4 border">Sisa Waktu</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+            <?php
+                $start_time = strtotime($row['tanggal_tugas']); 
+                $deadline_time = strtotime($row['deadline']);
+                $now = time();
+                $total_time = $deadline_time - $start_time; 
+                $remaining_time = $deadline_time - $now; 
+            ?>
+            <tr class="hover:bg-gray-100">
+                <td class="py-2 px-4 border"><?= htmlspecialchars($row['judul']) ?></td>
+                <td class="py-2 px-4 border"><?= htmlspecialchars($row['deadline']) ?></td>
+                <td class="py-2 px-4 border"><?= htmlspecialchars($row['tanggal_tugas']) ?></td>
+                <td class="py-2 px-4 border"><?= htmlspecialchars($row['created_by']) ?></td>
+                <td class="py-2 px-4 border"><?= htmlspecialchars($row['assigned_to']) ?></td>
+                <td class="py-2 px-4 border" id="status-<?= $row['id'] ?>"><?= htmlspecialchars($row['status']) ?></td>
+                <td class="py-2 px-4 border">
+                    <span id="timer-<?= $row['id'] ?>" class="px-2 py-1 rounded text-white font-bold"
+                          data-remaining="<?= $remaining_time ?>"
+                          data-total="<?= $total_time ?>"
+                          data-id="<?= $row['id'] ?>"
+                          data-status="<?= $row['status'] ?>"></span>
+                </td>
+            </tr>
+        <?php endwhile; ?>
+        </tbody>
+    </table>
+</div>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white rounded shadow-md">
-            <thead class="bg-gray-200 text-gray-600">
-                <tr>
-                    <th class="py-3 px-4 border">Nama</th>
-                    <th class="py-3 px-4 border">Judul Tugas</th>
-                    <th class="py-3 px-4 border">Deskripsi</th>
-                    <th class="py-3 px-4 border">Kategori</th>
-                    <th class="py-3 px-4 border">Tanggal Tugas</th>
-                    <th class="py-3 px-4 border">Deadline</th>
-                    <th class="py-3 px-4 border">Diberikan Oleh</th>
-                    <th class="py-3 px-4 border">Ditugaskan Kepada</th>
-                    <th class="py-3 px-4 border">Status</th>
-                   <th class="py-3 px-4 border">Sisa Hari</th>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const timers = document.querySelectorAll("[id^='timer-']");
 
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $bulan_indo = [
-                    'January' => 'Januari', 'February' => 'Februari', 'March' => 'Maret',
-                    'April' => 'April', 'May' => 'Mei', 'June' => 'Juni',
-                    'July' => 'Juli', 'August' => 'Agustus', 'September' => 'September',
-                    'October' => 'Oktober', 'November' => 'November', 'December' => 'Desember'
-                ];
+    timers.forEach(timer => {
+        let remaining = parseInt(timer.dataset.remaining);
+        const total = parseInt(timer.dataset.total);
+        const taskId = timer.dataset.id;
 
-                 
-      while ($row = mysqli_fetch_assoc($result)) {
-    $deadline_date = new DateTime($row['deadline']);
-    $now = new DateTime();
-    $interval = $now->diff($deadline_date);
-    $selisih_hari = (int)$interval->format('%r%a');
-    $selisih_detik = $deadline_date->getTimestamp() - $now->getTimestamp();
+        const interval = setInterval(() => {
+            // **REAL-TIME STATUS UPDATE**
+            fetch(`get_status.php?id=${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "selesai") {
+                        timer.textContent = "selesai";
+                        timer.className = "bg-green-500 px-2 py-1 rounded text-white font-bold";
+                        document.getElementById("status-" + taskId).textContent = "selesai";
+                        clearInterval(interval); // stop timer
+                        return;
+                    }
+                });
 
-    $formatted_tanggal = $deadline_date->format('d F Y');
-    $formatted_tanggal = strtr($formatted_tanggal, $bulan_indo);
+            if (remaining <= 0) {
+                timer.textContent = "Terlambat!";
+                timer.className = "bg-red-600 px-2 py-1 rounded text-white font-bold";
+                document.getElementById("status-" + taskId).textContent = "Terlambat";
+                updateStatus(taskId, "Terlambat");
+                clearInterval(interval);
+                return;
+            }
 
-    // Inisialisasi default
-    $keterangan = "Waktu tidak valid";
-    $statusColor = "bg-gray-500 text-white";
+            const hours = Math.floor(remaining / 3600);
+            const minutes = Math.floor((remaining % 3600) / 60);
+            const seconds = remaining % 60;
+            timer.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-    if ($selisih_detik <= 0) {
-    // Sudah lewat deadline
-    $keterangan = "Lewat waktu! ";
-    $statusColor = "bg-red-500 text-white";
-} elseif ($selisih_hari >= 3) {
-    // 3+ hari
-    $keterangan = "$selisih_hari hari lagi ";
-    $statusColor = "bg-green-500 text-white"; 
-} elseif ($selisih_hari == 2) {
-    // 2 hari
-    $keterangan = "$selisih_hari hari lagi ";
-    $statusColor = "bg-yellow-400 text-black";
-} else {
-        // Less than 1 day (display hours:minutes:seconds)
-        $jam = floor(abs($selisih_detik) / 3600);
-        $sisa_detik = abs($selisih_detik) % 3600;
-        $menit = floor($sisa_detik / 60);
-        $detik = $sisa_detik % 60;
-        // Ensure minutes are double digits (02) but keep seconds as normal (1 or 2 digits)
-        $keterangan = "Tersisa " . sprintf("%d:%d:%d", $jam, $menit, $detik); 
-        $statusColor = "bg-red-500 text-white";
+            const percent = remaining / total;
+            if (percent > 0.66) {
+                timer.className = "bg-green-500 px-2 py-1 rounded text-white font-bold";
+            } else if (percent > 0.33) {
+                timer.className = "bg-yellow-400 px-2 py-1 rounded text-black font-bold";
+            } else {
+                timer.className = "bg-red-500 px-2 py-1 rounded text-white font-bold";
+            }
+
+            remaining--;
+        }, 1000);
+    });
+});
+
+function updateStatus(id, status) {
+    fetch("update_status.php", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: `id=${id}&status=${status}`
+    });
 }
-    // Tampilkan di HTML
-    ?>
+</script>
 
-    <tr class="hover:bg-gray-100">
-        <td class="py-2 px-4 border"><?= htmlspecialchars($row['nama']) ?></td>
-        <td class="py-2 px-4 border"><?= htmlspecialchars($row['judul']) ?></td>
-        <td class="py-2 px-4 border"><?= htmlspecialchars($row['deskripsi']) ?></td>
-        <td class="py-2 px-4 border"><?= htmlspecialchars($row['kategori']) ?></td>
-        <td class="py-2 px-4 border"><?= htmlspecialchars($row['tanggal_tugas']) ?></td>
-        <td class="py-2 px-4 border"><?= htmlspecialchars($row['deadline']) ?></td>
-        <td class="py-2 px-4 border"><?= htmlspecialchars($row['created_by']) ?></td>
-        <td class="py-2 px-4 border"><?= htmlspecialchars($row['assigned_to']) ?></td>
-        <td class="py-2 px-4 border"><?= htmlspecialchars($row['status']) ?></td>
-        <td class="py-2 px-4 border">
-            <span class="px-2 py-1 rounded-full text-sm font-semibold <?= $statusColor ?>">
-                <?= $keterangan ?>
-</span>
-
-                    </td>
-                </tr>
-                <?php } ?>
-            </tbody>
-        </table>
-    </div>
 </body>
 </html>

@@ -7,7 +7,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dashboard Layanan</title>
+  <title>Dashboard Kesekretariatan</title>
   <style>
     body { font-family: Arial; background-color: #f5f5f5; margin: 0; padding: 20px; }
     h2 { color: #002244; }
@@ -30,7 +30,9 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
     }
   </style>
 </head>
+
 <body>
+  
 
   <h2>📋 Dashboard Layanan</h2>
 
@@ -39,6 +41,8 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
     <a href="?page=kategori" class="<?= $page == 'kategori' ? 'active' : '' ?>">Kategori</a>
     <a href="?page=orang" class="<?= $page == 'orang' ? 'active' : '' ?>">Orang</a>
     <a href="?page=selesai" class="<?= $page == 'selesai' ? 'active' : '' ?>">Selesai</a>
+    <a href="tambah.php?bidang=kesekretariatan" class="btn btn-primary">Tambah Tugas</a>
+
   </div>
 
   <?php
@@ -48,6 +52,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
       while ($row = mysqli_fetch_assoc($query)) {
           echo "<div class='card'>
                   <strong>".$row['judul']."</strong><br>
+                  Nama Pegawai:".$row['nama']."<br>
                   Kategori: ".$row['kategori']."<br>
                   Deadline: ".$row['deadline']."<br>
                   Status: ".$row['status']."

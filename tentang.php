@@ -36,7 +36,7 @@
   
   <section class="px-8 md:px-24 py-12 bg-[#f5f5f5]">
     <h1 class="text-center text-2xl md:text-3xl font-semibold text-gray-800 mb-4">
-      Selamat datang di Sistem Monitoring Penugasan
+      Selamat datang di Sistem Monitoring Tugas Pegawai
     </h1>
     <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
       Platform digital yang dirancang untuk membantu instansi dan organisasi dalam mengelola, memantau, serta mengevaluasi penugasan pegawai secara efektif dan efisien.

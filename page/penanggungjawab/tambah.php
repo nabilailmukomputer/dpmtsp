@@ -1,40 +1,65 @@
 <?php
 include '../../db.php';
-session_start();
-if ($_SESSION['role'] !== 'pj') {
-    header("Location: login.php");
-    exit;
-}
 
-$bidang = $_GET['bidang']; 
+if (!isset($_GET['bidang'])) {
+    die("Parameter bidang tidak ditemukan!");
+}
+$bidang = $_GET['bidang'];
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $judul = $_POST['judul'];
     $deskripsi = $_POST['deskripsi'];
     $tanggal_tugas = $_POST['tanggal_tugas'];
     $deadline = $_POST['deadline'];
-    $ditugaskan_kepada = $_POST['ditugaskan_kepada'];
+    $assigned_to = $_POST['assigned_to'];
     $pj_id = $_SESSION['id_user'];
 
-    $query = "INSERT INTO task (judul, deskripsi, tanggal_tugas, deadline, diberikan_oleh, ditugaskan_kepada, bidang)
+    $query = "INSERT INTO task (judul, deskripsi, tanggal_tugas, deadline, created_by, assigned_to, bidang_user)
               VALUES ('$judul', '$deskripsi', '$tanggal_tugas', '$deadline', '$created_by', '$assigned_to', '$bidang_user')";
-    mysqli_query($conn, $query);
-    header("Location: {$bidang}_dashboard.php");
+
+    if (mysqli_query($conn, $query)) {
+        header("Location: {$bidang}.php");
+        exit;
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
 }
 ?>
-
-<form method="POST" class="bg-white p-6 rounded shadow w-1/2 mx-auto mt-10">
-    <h2 class="text-xl font-bold mb-4">Tambah Tugas Bidang <?= ucfirst($bidang) ?></h2>
-    <input type="text" name="judul" placeholder="Judul Tugas" class="border w-full p-2 mb-3">
-    <textarea name="deskripsi" placeholder="Deskripsi" class="border w-full p-2 mb-3"></textarea>
-    <input type="date" name="tanggal_tugas" class="border w-full p-2 mb-3">
-    <input type="date" name="deadline" class="border w-full p-2 mb-3">
-    <select name="ditugaskan_kepada" class="border w-full p-2 mb-3">
-        <?php
-        $pegawai = mysqli_query($conn, "SELECT * FROM user WHERE role='Anggota' AND bidang='$bidang'");
-        while ($row = mysqli_fetch_assoc($pegawai)) {
-            echo "<option value='{$row['id']}'>{$row['username']}</option>";
-        }
-        ?>
-    </select>
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Tambah Tugas</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tambah Tugas</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+<div class="container">
+    <h1 class="mb-4">Tambah Tugas - Bidang: <?php echo htmlspecialchars($bidang); ?></h1>
+    <form method="POST" class="p-4 border rounded bg-light">
+        <div class="mb-3">
+            <label class="form-label">Judul Tugas</label>
+            <input type="text" name="judul" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Deskripsi</label>
+            <textarea name="deskripsi" class="form-control" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Tanggal Tugas</label>
+            <input type="date" name="tanggal_tugas" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Deadline</label>
+            <input type="date" name="deadline" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Ditugaskan Kepada</label>
+            <input type="text" name="ditugaskan_kepada" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-success">Simpan Tugas</button>
+        <a href="<?php echo $bidang; ?>_dashboard.php" class="btn btn-secondary">Kembali</a>
+    </form>
+</div>
+</body>
+</html>
