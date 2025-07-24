@@ -41,13 +41,18 @@ $terlambat = $data['status'];
 
   <div class="flex h-screen">
     <!-- Sidebar -->
+<<<<<<< Updated upstream
     <aside class="w-64 bg-[#0D2B53] text-white flex flex-col min-h-screen">
+=======
+   <aside class="w-64 bg-[#0D2B53] text-white flex flex-col min-h-screen">
+>>>>>>> Stashed changes
       <!-- Logo dan SIMANTAP -->
       <div class="flex items-center px-6 py-6 text-xl font-bold space-x-2">
         <img src="assets/titik_tiga.png" alt="Logo" class="w-6 h-6"/>
         <span>SIMANTAP</span>
       </div>
 
+<<<<<<< Updated upstream
       <!-- Menu Admin -->
       <nav class="mt-2 px-4">
         <ul class="space-y-2 text-sm">
@@ -76,6 +81,32 @@ $terlambat = $data['status'];
           </li>
           <li>
             <a href="kelola_admin.php" class="block py-2 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola Pengguna</a>
+=======
+      <!-- Tombol Dashboard -->
+      <button class="flex items-center gap-2 mx-4 my-2 py-2 px-4 rounded-md text-white font-medium hover:bg-orange-500 w-[85%] text-left transition duration-300 hover:translate-x-1 hover:bg-opacity-90">
+        <span class="material-icons text-black">menu_book</span>
+        <span class="text-white">Dashboard</span>
+      </button>
+
+      <!-- Menu Admin -->
+      <nav class="mt-2 px-4">
+        <h2 class="text-sm font-bold text-gray-300 mb-2">MENU UNTUK ADMIN</h2>
+        <ul class="space-y-2 text-sm">
+          <li>
+            <a href="detail.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Detail Tugas</a>
+          </li>
+          <li>
+            <a href="laporan.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Laporan Harian</a>
+          </li>
+          <li>
+            <a href="tenggat.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Permohonan Tenggat</a>
+          </li>
+          <li>
+            <a href="kinerja_pegawai.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kinerja Pegawai</a>
+          </li>
+          <li>
+            <a href="kelola_admin.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola Pengguna</a>
+>>>>>>> Stashed changes
           </li>
         </ul>
       </nav>
