@@ -44,7 +44,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
   <?php
   if ($page == 'semua') {
       echo "<h3>📌 Semua Tugas</h3>";
-      $query = mysqli_query($conn, "SELECT * FROM task WHERE bidang_user='Pelayanan'");
+      $query = mysqli_query($conn, "SELECT * FROM task WHERE bidang_user='pelayanan'");
       while ($row = mysqli_fetch_assoc($query)) {
           echo "<div class='card'>
                   <strong>".$row['judul']."</strong><br>
@@ -57,7 +57,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
 
   elseif ($page == 'kategori') {
       echo "<h3>📁 Kategori Tugas</h3>";
-      $query = mysqli_query($conn, "SELECT DISTINCT kategori FROM task WHERE bidang_user='Pelayanan'");
+      $query = mysqli_query($conn, "SELECT DISTINCT kategori FROM task WHERE bidang_user='pelayanan'");
       while ($row = mysqli_fetch_assoc($query)) {
           echo "<div class='card'>".$row['kategori']."</div>";
       }
@@ -65,7 +65,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
 
   elseif ($page == 'orang') {
       echo "<h3>👤 Pegawai di Bidang Layanan</h3>";
-      $query = mysqli_query($conn, "SELECT DISTINCT nama FROM user WHERE bidang='Pelayanan'");
+      $query = mysqli_query($conn, "SELECT DISTINCT nama FROM user WHERE bidang='pelayanan'");
       while ($row = mysqli_fetch_assoc($query)) {
           echo "<div class='card'>".$row['nama']."</div>";
       }
@@ -73,7 +73,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
 
   elseif ($page == 'selesai') {
       echo "<h3>✅ Tugas Selesai</h3>";
-      $query = mysqli_query($conn, "SELECT * FROM task WHERE bidang_user='Pelayanan' AND status='selesai'");
+      $query = mysqli_query($conn, "SELECT * FROM task WHERE bidang_user='pelayanan' AND status='selesai'");
       while ($row = mysqli_fetch_assoc($query)) {
           echo "<div class='card'>
                   <strong>".$row['judul']."</strong><br>

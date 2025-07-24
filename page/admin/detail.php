@@ -20,11 +20,18 @@ $result = mysqli_query($conn, $query);
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 p-6">
-    <h1 class="text-3xl font-bold mb-6">Detail Tugas Pegawai</h1>
-     <form action="search.php" method="GET" class="relative">
-          <input type="text" name="q" placeholder="Cari...." class="bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none" />
-          <button type="submit" class="absolute right-2 top-2 text-gray-400 hover:text-white">🔍</button>
+    <!-- Container Header -->
+    <div class="flex justify-between items-center bg-gray-200 p-4 rounded-lg mb-6">
+        <!-- Judul -->
+        <h1 class="text-2xl font-bold text-gray-800">Detail Tugas Pegawai</h1>
+
+        <!-- Search Form -->
+        <form action="search.php" method="GET" class="flex items-center bg-gray-800 rounded-lg px-3 py-2 w-72">
+            <input type="text" name="q" placeholder="Cari...." 
+                class="bg-gray-800 text-white placeholder-gray-400 w-full focus:outline-none" />
+            <button type="submit" class="text-gray-400 hover:text-white ml-2">🔍</button>
         </form>
+    </div>
 
     <div class="overflow-x-auto">
         <table class="min-w-full bg-white rounded shadow-md">
@@ -69,15 +76,15 @@ $result = mysqli_query($conn, $query);
 
     if ($selisih_detik <= 0) {
     // Sudah lewat deadline
-    $keterangan = "Lewat waktu! ($formatted_tanggal)";
+    $keterangan = "Lewat waktu! ";
     $statusColor = "bg-red-500 text-white";
 } elseif ($selisih_hari >= 3) {
     // 3+ hari
-    $keterangan = "$selisih_hari hari lagi ($formatted_tanggal)";
+    $keterangan = "$selisih_hari hari lagi ";
     $statusColor = "bg-green-500 text-white"; 
 } elseif ($selisih_hari == 2) {
     // 2 hari
-    $keterangan = "$selisih_hari hari lagi ($formatted_tanggal)";
+    $keterangan = "$selisih_hari hari lagi ";
     $statusColor = "bg-yellow-400 text-black";
 } else {
         // Less than 1 day (display hours:minutes:seconds)
