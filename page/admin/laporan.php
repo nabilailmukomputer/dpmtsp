@@ -47,7 +47,7 @@ $result = mysqli_query($conn, $query);
                     </a>
                 </li>
             </ul>
-            <h2 class="text-[8px] font-bold text-gray-300 mb-2 ml-2">MENU UNTUK ADMIN</h2>
+            <h2 class="text-[8px] font-bold text-gray-300 mb-2 ">MENU UNTUK ADMIN</h2>
             <ul class="space-y-2 text-sm">
                 <li>
                     <a href="detail.php"

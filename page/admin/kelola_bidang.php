@@ -43,7 +43,7 @@ if (isset($_GET['hapus'])) {
                         </a>
                     </li>
                 </ul>
-                <h2 class="text-[8px] font-bold text-gray-300 mb-2 ml-2">MENU UNTUK ADMIN</h2>
+                <h2 class="text-[8px] font-bold text-gray-300 mb-2 ">MENU UNTUK ADMIN</h2>
                 <ul class="space-y-2 text-sm">
                     <li><a href="detail.php"
                             class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Detail

@@ -3,7 +3,7 @@ include '../../db.php';
 session_start();
 
 // Ambil data permohonan tenggat
-$query = "SELECT dr.*, u.nama AS nama_pengaju, t.deadline AS deadline_awal
+$query = "SELECT dr.*, u.nama AS reviewed_by, t.deadline AS deadline_awal
           FROM deadline_request dr
           JOIN user u ON dr.user_id = u.id
           JOIN task t ON dr.task_id = t.id
@@ -48,7 +48,7 @@ $result = mysqli_query($conn, $query);
                         </a>
                     </li>
                 </ul>
-                <h2 class="text-[8px] font-bold text-gray-300 mb-2 ml-2">MENU UNTUK ADMIN</h2>
+                <h2 class="text-[8px] font-bold text-gray-300 mb-2 ">MENU UNTUK ADMIN</h2>
                 <ul class="space-y-2 text-sm">
                     <li>
                         <a href="detail.php"
