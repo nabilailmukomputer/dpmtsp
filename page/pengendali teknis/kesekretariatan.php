@@ -1,5 +1,5 @@
 <?php
-include '../../db.php'; // pastikan path-nya sesuai
+include '../../db.php';
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
 ?>

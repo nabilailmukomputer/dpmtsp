@@ -37,26 +37,33 @@ $terlambat = $data['status'];
     }
   </style>
 </head>
-<body class="bg-[#F5F5F5]">
+<body class="bg-gray-100">
 
   <div class="flex h-screen">
     <!-- Sidebar -->
    <aside class="w-64 bg-[#0D2B53] text-white flex flex-col min-h-screen">
       <!-- Logo dan SIMANTAP -->
-      <div class="flex items-center px-6 py-6 text-xl font-bold space-x-2">
-        <img src="assets/titik_tiga.png" alt="Logo" class="w-6 h-6"/>
-        <span>SIMANTAP</span>
-      </div>
+            <div class="flex items-center px-6 py-6 text-xl font-bold space-x-2">
+                <img src="assets/titik_tiga.png" alt="Logo" class="w-6 h-6" />
+                <span>SIMANTAP</span>
+            </div>
 
       <!-- Tombol Dashboard -->
-      <button class="flex items-center gap-2 mx-4 my-2 py-2 px-4 rounded-md text-white font-medium hover:bg-orange-500 w-[85%] text-left transition duration-300 hover:translate-x-1 hover:bg-opacity-90">
-        <span class="material-icons text-black">menu_book</span>
-        <span class="text-white">Dashboard</span>
-      </button>
 
       <!-- Menu Admin -->
       <nav class="mt-2 px-4">
-        <h2 class="text-sm font-bold text-gray-300 mb-2">MENU UNTUK ADMIN</h2>
+                        <ul class="space-y-2 text-sm">
+                    <li>
+                        <a href="dashboard.php"
+                            class="block py-2.5 px-2.5 font-bold rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1 mb-2">
+                            <span class="flex items-center gap-2">
+                                <span class="material-icons text-[#F7EDED]">menu_book</span>
+                                Dashboard
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+        <h2 class="text-[8px] font-bold text-gray-300 mb-2">MENU UNTUK ADMIN</h2>
         <ul class="space-y-2 text-sm">
           <li>
             <a href="detail.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Detail Tugas</a>
@@ -103,36 +110,35 @@ $terlambat = $data['status'];
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
     <!-- Total Tugas -->
     <div class="bg-blue-600 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:scale-105 transition"
          onclick="window.location.href='detail_tugas.php?status=all'">
         <h2 class="text-lg font-semibold">Total Tugas</h2>
-        <p class="text-3xl font-bold mt-2">7</p>
+        <p class="text-3xl font-bold mt-2"><?= $totalTugas; ?></p>
     </div>
 
     <!-- Tugas Selesai -->
     <div class="bg-green-600 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:scale-105 transition"
          onclick="window.location.href='detail_tugas.php?status=selesai'">
         <h2 class="text-lg font-semibold">Tugas Selesai</h2>
-        <p class="text-3xl font-bold mt-2">3</p>
+        <p class="text-3xl font-bold mt-2"><?= $Selesai; ?></p>
     </div>
 
     <!-- Tugas Berlangsung -->
     <div class="bg-yellow-500 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:scale-105 transition"
-         onclick="window.location.href='detail_tugas.php?status=berlangsung'">
+         onclick="window.location.href='detail_tugas.php?status=dikerjakan'">
         <h2 class="text-lg font-semibold">Tugas Berlangsung</h2>
-        <p class="text-3xl font-bold mt-2">2</p>
+        <p class="text-3xl font-bold mt-2"><?= $dikerjakan; ?></p>
     </div>
 
     <!-- Tugas Terlambat -->
     <div class="bg-red-600 text-white rounded-xl shadow-lg p-6 cursor-pointer hover:scale-105 transition"
          onclick="window.location.href='detail_tugas.php?status=terlambat'">
         <h2 class="text-lg font-semibold">Tugas Terlambat</h2>
-        <p class="text-3xl font-bold mt-2">2</p>
+        <p class="text-3xl font-bold mt-2"><?= $terlambat; ?></p>
     </div>
 </div>
-
 
 </body>
 </html>

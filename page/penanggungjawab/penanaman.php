@@ -32,11 +32,10 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
 </head>
 <body>
 
-  <h2>📋 Dashboard Layanan</h2>
+  <h2>📋 Dashboard Penanaman Modal</h2>
 
   <div class="nav">
     <a href="?page=semua" class="<?= $page == 'semua' ? 'active' : '' ?>">Semua Tugas</a>
-    <a href="?page=kategori" class="<?= $page == 'kategori' ? 'active' : '' ?>">Kategori</a>
     <a href="?page=orang" class="<?= $page == 'orang' ? 'active' : '' ?>">Orang</a>
     <a href="?page=selesai" class="<?= $page == 'selesai' ? 'active' : '' ?>">Selesai</a>
     <a href="tambah.php?bidang=penanaman modal" class="btn btn-primary">Tambah Tugas</a>
@@ -58,21 +57,26 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
       }
   }
 
-  elseif ($page == 'kategori') {
-      echo "<h3>📁 Kategori Tugas</h3>";
-      $query = mysqli_query($conn, "SELECT DISTINCT kategori FROM task WHERE bidang_user='Penanaman Modal'");
-      while ($row = mysqli_fetch_assoc($query)) {
-          echo "<div class='card'>".$row['kategori']."</div>";
-      }
-  }
-
   elseif ($page == 'orang') {
-      echo "<h3>👤 Pegawai di Bidang Layanan</h3>";
-      $query = mysqli_query($conn, "SELECT DISTINCT nama FROM user WHERE bidang='Penanaman Modal'");
-      while ($row = mysqli_fetch_assoc($query)) {
-          echo "<div class='card'>".$row['nama']."</div>";
-      }
-  }
+    echo "<h3>👤 Pegawai di Bidang Penanaman Modal</h3>";
+    
+    // Query yang lebih baik (join tabel jika diperlukan)
+    $query = mysqli_query($conn, "SELECT u.id, u.nama 
+                                 FROM user u
+                                 JOIN bidang b ON u.bidang_id = b.id
+                                 WHERE b.nama = 'Penanaman Modal'");
+    
+    if(mysqli_num_rows($query) > 0) {
+        while ($row = mysqli_fetch_assoc($query)) {
+            echo "<div class='card'>
+                    <strong>".htmlspecialchars($row['nama'])."</strong>
+                    <p>ID: ".$row['id']."</p>
+                  </div>";
+        }
+    } else {
+        echo "<div class='card'>Tidak ada data pegawai</div>";
+    }
+}
 
   elseif ($page == 'selesai') {
       echo "<h3>✅ Tugas Selesai</h3>";

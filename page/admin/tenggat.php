@@ -52,29 +52,32 @@ $result = mysqli_query($conn, $query);
                 <ul class="space-y-2 text-sm">
                     <li>
                         <a href="detail.php"
-                            class="block py-2 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Detail
+                            class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Detail
                             Tugas</a>
                     </li>
                     <li>
                         <a href="laporan.php"
-                            class="block py-2 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Laporan
+                            class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Laporan
                             Harian</a>
                     </li>
                     <li>
                         <a href="tenggat.php"
-                            class="block py-2 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Permohonan
+                            class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Permohonan
                             Tenggat</a>
                     </li>
                     <li>
                         <a href="kinerja_pegawai.php"
-                            class="block py-2 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kinerja
+                            class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kinerja
                             Pegawai</a>
                     </li>
                     <li>
                         <a href="kelola_admin.php"
-                            class="block py-2 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola
+                            class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola
                             Pengguna</a>
                     </li>
+                              <li>
+            <a href="kelola_bidang.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola Bidang</a>
+          </li>
                 </ul>
             </nav>
 

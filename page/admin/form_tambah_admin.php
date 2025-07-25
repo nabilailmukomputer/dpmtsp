@@ -28,17 +28,14 @@ $NIP = '';
 // Jika form disubmit
 if (isset($_POST['tambah'])) {
     $nama = $_POST['nama'];
-    $password = $_POST['password'];
+    $password = $_POST['password']; // <-- TANPA HASH
     $role = $_POST['role'];
     $bidang_id = $_POST['bidang'];
     $NIP = $_POST['NIP'];
 
-    // Hash password
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-    // Simpan ke database
+    // Simpan langsung ke database (tanpa hash)
     $stmt = $conn->prepare("INSERT INTO user (nama, password, role, bidang_id, NIP) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssis", $nama, $hashedPassword, $role, $bidang_id, $NIP);
+    $stmt->bind_param("sssis", $nama, $password, $role, $bidang_id, $NIP);
 
     if ($stmt->execute()) {
         header("Location: kelola_admin.php");
@@ -71,7 +68,7 @@ if (isset($_POST['tambah'])) {
             <input type="text" name="nama" value="<?= htmlspecialchars($nama) ?>" required class="w-full mb-4 p-2 border rounded">
 
             <label class="block mb-2 font-semibold">Password</label>
-            <input type="password" name="password" value="<?= htmlspecialchars($password) ?>" required class="w-full mb-4 p-2 border rounded">
+            <input type="text" name="password" value="<?= htmlspecialchars($password) ?>" required class="w-full mb-4 p-2 border rounded">
 
             <label class="block mb-2 font-semibold">Role</label>
             <select name="role" required class="w-full mb-4 p-2 border rounded">

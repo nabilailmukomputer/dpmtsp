@@ -1,6 +1,8 @@
 <?php
 include '../../db.php';
 session_start();
+date_default_timezone_set('Asia/Jakarta'); // Set timezone ke WITA
+$now = time(); 
 
 $query = "SELECT t.*, 
                 u1.nama AS penerima, 
@@ -23,6 +25,61 @@ $result = mysqli_query($conn, $query);
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
+     <div class="flex h-screen">
+    <!-- Sidebar -->
+   <aside class="w-64 bg-[#0D2B53] text-white flex flex-col min-h-screen">
+      <!-- Logo dan SIMANTAP -->
+            <div class="flex items-center px-6 py-6 text-xl font-bold space-x-2">
+                <img src="assets/titik_tiga.png" alt="Logo" class="w-6 h-6" />
+                <span>SIMANTAP</span>
+            </div>
+
+      <!-- Tombol Dashboard -->
+
+      <!-- Menu Admin -->
+     <nav class="mt-2 px-4">
+                        <ul class="space-y-2 text-sm">
+                    <li>
+                        <a href="dashboard.php"
+                            class="block py-2.5 px-2.5 font-bold rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1 mb-2">
+                            <span class="flex items-center gap-2">
+                                <span class="material-icons text-[#F7EDED]">menu_book</span>
+                                Dashboard
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+        <h2 class="text-[8px] font-bold text-gray-300 mb-2">MENU UNTUK ADMIN</h2>
+        <ul class="space-y-2 text-sm">
+          <li>
+            <a href="detail.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Detail Tugas</a>
+          </li>
+          <li>
+            <a href="laporan.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Laporan Harian</a>
+          </li>
+          <li>
+            <a href="tenggat.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Permohonan Tenggat</a>
+          </li>
+          <li>
+            <a href="kinerja_pegawai.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kinerja Pegawai</a>
+          </li>
+          <li>
+            <a href="kelola_admin.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola Pengguna</a>
+          </li>
+          <li>
+            <a href="kelola_bidang.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola Bidang</a>
+          </li>
+        </ul>
+      </nav>
+
+       <div class="mt-auto px-4 py-4">
+        <a href="../logout.php" class="flex items-center gap-2 text-white-500 hover:underline text-sm transition duration-300">
+          <span class="material-icons">logout</span>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+    
 
 <div class="p-6">
     <h1 class="text-3xl font-bold mb-6">Detail Tugas Pegawai</h1>
@@ -32,7 +89,6 @@ $result = mysqli_query($conn, $query);
                 <th class="py-3 px-4 border">Judul Tugas</th>
                 <th class="py-3 px-4 border">Deadline</th>
                 <th class="py-3 px-4 border">Tanggal Penugasan</th>
-                <th class="py-3 px-4 border">Pemberi</th>
                 <th class="py-3 px-4 border">Penerima</th>
                 <th class="py-3 px-4 border">Status</th>
                 <th class="py-3 px-4 border">Sisa Waktu</th>
@@ -51,7 +107,6 @@ $result = mysqli_query($conn, $query);
                 <td class="py-2 px-4 border"><?= htmlspecialchars($row['judul']) ?></td>
                 <td class="py-2 px-4 border"><?= htmlspecialchars($row['deadline']) ?></td>
                 <td class="py-2 px-4 border"><?= htmlspecialchars($row['tanggal_tugas']) ?></td>
-                <td class="py-2 px-4 border"><?= htmlspecialchars($row['created_by']) ?></td>
                 <td class="py-2 px-4 border"><?= htmlspecialchars($row['assigned_to']) ?></td>
                 <td class="py-2 px-4 border" id="status-<?= $row['id'] ?>"><?= htmlspecialchars($row['status']) ?></td>
                 <td class="py-2 px-4 border">
