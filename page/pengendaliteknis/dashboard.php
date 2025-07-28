@@ -36,7 +36,7 @@ $pegawai = mysqli_query($conn, $queryPegawai);
 </head>
 <body class="flex bg-gray-100">
     <!-- Sidebar -->
-    <aside class="w-64 bg-blue-800 text-white h-screen p-5">
+    <aside class="w-64 bg-gray-800 text-white h-screen p-5">
         <h1 class="text-2xl font-bold mb-6">Pengendali</h1>
         <nav>
             <ul>

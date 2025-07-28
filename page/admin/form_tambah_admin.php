@@ -35,7 +35,7 @@ if (isset($_POST['tambah'])) {
 
     // Simpan langsung ke database (tanpa hash)
     $stmt = $conn->prepare("INSERT INTO user (nama, password, role, bidang_id, NIP) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssii", $nama, $password, $role, $bidang_id, $NIP);
+    $stmt->bind_param("sssis", $nama, $password, $role, $bidang_id, $NIP);
 
     if ($stmt->execute()) {
         header("Location: kelola_admin.php");
@@ -91,7 +91,7 @@ if (isset($_POST['tambah'])) {
             </select>
 
             <label class="block mb-2 font-semibold">NIP</label>
-            <input type="int" name="NIP" value="<?= htmlspecialchars($NIP) ?>" required class="w-full mb-4 p-2 border rounded">
+            <input type="text" name="NIP" value="<?= htmlspecialchars($NIP) ?>" required class="w-full mb-4 p-2 border rounded">
 
             <button type="submit" name="tambah" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Simpan</button>
             <a href="kelola_admin.php" class="ml-4 text-gray-600 hover:underline">Kembali</a>
