@@ -27,7 +27,7 @@ if (isset($_GET['hapus'])) {
         <!-- Sidebar -->
         <aside class="w-64 bg-[#0D2B53] text-white flex flex-col">
             <div class="flex items-center px-6 py-6 text-xl font-bold space-x-2">
-                <img src="assets/titik_tiga.png" alt="Logo" class="w-6 h-6" />
+                <img src="../../assets/s.png" alt="Logo" class="w-6 h-6" />
                 <span>SIMANTAP</span>
             </div>
 
@@ -43,7 +43,7 @@ if (isset($_GET['hapus'])) {
                         </a>
                     </li>
                 </ul>
-                <h2 class="text-[8px] font-bold text-gray-300 mb-2 ">MENU UNTUK ADMIN</h2>
+                <h2 class="text-[8px] font-bold text-gray-300 mb-2 ml-2">MENU UNTUK ADMIN</h2>
                 <ul class="space-y-2 text-sm">
                     <li><a href="detail.php"
                             class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Detail
@@ -92,6 +92,7 @@ if (isset($_GET['hapus'])) {
                             <tr>
                                 <th class="border px-4 py-2 text-left">No</th>
                                 <th class="border px-4 py-2 text-left">Bidang</th>
+                                 <th class="border px-4 py-2 text-left">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>

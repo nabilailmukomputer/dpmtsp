@@ -41,6 +41,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
     <a href="?page=orang" class="<?= $page == 'orang' ? 'active' : '' ?>">Orang</a>
     <a href="?page=selesai" class="<?= $page == 'selesai' ? 'active' : '' ?>">Selesai</a>
     <a href="tambah.php?bidang=kesekretariatan" class="btn btn-primary">Tambah Tugas</a>
+     <a href="permohonan_tenggat.php?bidang=kesekretariatan" class="btn btn-primary">Permohonana Tenggat</a>
 
   </div>
 

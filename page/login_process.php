@@ -12,30 +12,30 @@ $data  = mysqli_fetch_assoc($query);
 
 if ($data) {
     // Simpan ke sesi
-    $_SESSION['user'] = $data;
-    session_regenerate_id(true); // opsional tapi disarankan
+    $_SESSION['user_id']   = $data['id'];        // ID user
+    $_SESSION['nama']      = $data['nama'];      // Nama
+    $_SESSION['role']      = $data['role'];      // Role
+    $_SESSION['bidang']    = $data['bidang'];    // Nama bidang
+    $_SESSION['bidang_id'] = $data['bidang_id']; // Jika ada kolom ini di DB
 
-    // Ambil role dari DB
-    $role = strtolower(trim($data['role'] ?? ''));
+    session_regenerate_id(true);
 
-    // Mapping role -> path (gunakan folder tanpa spasi)
+    // Mapping role
     $routes = [
         'admin'              => 'admin/dashboard.php',
         'penanggung jawab'   => 'penanggungjawab/dashboard.php',
-        'pengendali teknis'  => 'pengendali_teknis/dashboard.php',
+        'pengendali teknis'  => 'pengendaliteknis/dashboard.php', // Ganti folder tanpa spasi
         'ketua divisi'       => 'ketua_divisi/dashboard.php',
         'pegawai'            => 'pegawai/dashboard.php',
     ];
 
+    $role = strtolower(trim($data['role']));
     if (isset($routes[$role])) {
         header('Location: ' . $routes[$role]);
         exit;
     } else {
         echo "<script>alert('Role tidak dikenali di sistem.');window.location='login.php';</script>";
-        exit;
     }
 } else {
     echo "<script>alert('Login gagal! Periksa nama dan password.');window.location='login.php';</script>";
-    exit;
 }
-

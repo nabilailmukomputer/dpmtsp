@@ -30,7 +30,7 @@ $result = mysqli_query($conn, $query);
     <aside class="w-64 bg-[#0D2B53] text-white flex flex-col min-h-screen">
         <!-- Logo dan SIMANTAP -->
         <div class="flex items-center px-6 py-6 text-xl font-bold space-x-2">
-            <img src="assets/titik_tiga.png" alt="Logo" class="w-6 h-6" />
+            <img src="../../assets/s.png" alt="Logo" class="w-6 h-6" />
             <span>SIMANTAP</span>
         </div>
 
@@ -47,7 +47,7 @@ $result = mysqli_query($conn, $query);
                     </a>
                 </li>
             </ul>
-            <h2 class="text-[8px] font-bold text-gray-300 mb-2 ">MENU UNTUK ADMIN</h2>
+            <h2 class="text-[8px] font-bold text-gray-300 mb-2 ml-2">MENU UNTUK ADMIN</h2>
             <ul class="space-y-2 text-sm">
                 <li>
                     <a href="detail.php"
