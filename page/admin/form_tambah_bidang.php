@@ -1,7 +1,11 @@
 <?php
 include '../../db.php';
 
-// Inisialisasi nilai kosong agar tidak error saat form pertama kali dibuka
+if (!isset($_SESSION['user_id']) ) {
+    // Jika belum, redirect ke halaman login
+    header('Location: ../login.php');
+    exit;
+}
 
 $bidang = '';
 // Jika form disubmit

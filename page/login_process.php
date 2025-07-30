@@ -13,7 +13,8 @@ $data  = mysqli_fetch_assoc($query);
 if ($data) {
     // Simpan ke sesi
     $_SESSION['user_id']   = $data['id'];        // ID user
-    $_SESSION['nama']      = $data['nama'];      // Nama
+    $_SESSION['nama']      = $data['nama']; 
+    $_SESSION['password']  = $data['password']; 
     $_SESSION['role']      = $data['role'];      // Role
     $_SESSION['bidang']    = $data['bidang'];    // Nama bidang
     $_SESSION['bidang_id'] = $data['bidang_id']; // Jika ada kolom ini di DB

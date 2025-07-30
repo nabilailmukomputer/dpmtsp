@@ -1,6 +1,11 @@
 <?php
 include '../../db.php';
 
+if (!isset($_SESSION['user_id']) ) {
+    // Jika belum, redirect ke halaman login
+    header('Location: ../login.php');
+    exit;
+}
 // Daftar role manual
 $roles = [
     'admin' => 'Admin',

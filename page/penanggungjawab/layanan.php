@@ -1,6 +1,12 @@
 <?php
 include '../../db.php'; // pastikan path-nya sesuai
 
+if (!isset($_SESSION['user_id']) ) {
+    // Jika belum, redirect ke halaman login
+    header('Location: ../login.php');
+    exit;
+}
+
 $page = isset($_GET['page']) ? $_GET['page'] : 'semua';
 ?>
 

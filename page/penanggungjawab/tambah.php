@@ -2,6 +2,12 @@
 session_start();
 include '../../db.php';
 
+
+if (!isset($_SESSION['user_id']) ) {
+    // Jika belum, redirect ke halaman login
+    header('Location: ../login.php');
+    exit;
+}
 $roles = [
     'admin' => 'Admin',
     'penanggung jawab' => 'Penanggung Jawab',

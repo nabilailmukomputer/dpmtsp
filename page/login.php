@@ -4,21 +4,21 @@ include '../db.php';
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Login - SIMANTAP</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<title>Login - SIMANTAP</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
     body {
         margin: 0;
         padding: 0;
         height: 100vh;
-        background: linear-gradient(135deg, #e3f2fd, #90caf9, #42a5f5);
+        background: linear-gradient(135deg, #1f2937, #111827);
         overflow: hidden;
         font-family: 'Poppins', sans-serif;
         transition: background 0.3s ease;
     }
     .dark-mode {
-        background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
+        background: linear-gradient(135deg, #0f172a, #1e293b);
     }
     canvas {
         position: fixed;
@@ -26,25 +26,49 @@ include '../db.php';
         left: 0;
         z-index: -1;
     }
-    /* Animasi Fade-in */
-    .fade-in {
-        opacity: 0;
-        transform: translateY(30px);
-        animation: fadeIn 1s ease-out forwards;
+    /* Glass Card dengan glow soft */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
-    @keyframes fadeIn {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        background: rgba(255, 255, 255, 0.3);
+        filter: blur(10px);
+        animation: pulseGlow 4s infinite ease-in-out;
+        z-index: -1;
+    }
+    @keyframes pulseGlow {
+        0%, 100% { opacity: 0.15; }
+        50% { opacity: 0.4; }
+    }
+    .glass-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+    .gradient-text {
+        background: linear-gradient(90deg, #ffffff, #e5e7eb);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        font-weight: 800;
+        letter-spacing: 2px;
     }
 </style>
 </head>
-<body class="bg-[#77BEF0] min-h-screen flex items-center justify-center relative">
+<body class="min-h-screen flex items-center justify-center relative text-white">
 
 <canvas id="particleCanvas"></canvas>
 
-<!-- DARK MODE TOGGLE -->
+<!-- Dark Mode Button -->
 <div class="absolute top-4 right-4 z-20">
     <button id="darkModeToggle" class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition">
         🌙 Dark Mode
@@ -52,38 +76,39 @@ include '../db.php';
 </div>
 
 <!-- LOGIN CARD -->
-<div class="bg-white shadow-lg rounded-lg flex max-w-4xl w-full overflow-hidden z-10 fade-in" id="loginCard">
-    <div class="w-1/2 hidden md:flex items-center justify-center p-10 bg-gray-100">
+<div class="glass-card p-6 flex flex-col md:flex-row max-w-lg w-full z-10">
+    <!-- Bagian Gambar -->
+    <div class="hidden md:flex w-1/2 items-center justify-center p-3">
         <img src="../assets/4a903338c0e478248153bd8f3f6f6745.jpg" alt="Ilustrasi Login" class="max-w-full h-auto rounded-lg">
     </div>
-    <div class="w-full md:w-1/2 p-10 flex flex-col justify-center bg-white dark:bg-gray-800">
-        <h2 class="text-2xl font-bold mb-8 text-gray-800 dark:text-white">LOGIN</h2>
-        <form action="login_process.php" method="POST">
-            <label for="nama" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Username:</label>
-            <input type="text" id="nama" name="nama" required
-                class="w-full px-4 py-2 rounded-md bg-[#f0f0f0] dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400">
-            <div class="space-y-4 mt-4">
-                <div class="relative">
-                    <label for="password" class="block text-sm text-gray-700 dark:text-gray-300 mb-1">Password:</label>
-                    <input type="password" id="password" name="password" required
-                        class="w-full px-4 py-2 rounded-md bg-[#f0f0f0] dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <!-- Toggle Icon -->
-                    <span class="absolute top-10 right-3 cursor-pointer text-gray-500 dark:text-gray-300" id="togglePassword">👁</span>
-                </div>
-                <button type="submit"
-                    class="w-full bg-[#003366] text-white py-2 rounded-md font-semibold hover:bg-[#002244] transition duration-300 transform hover:scale-105">
-                    Login
-                </button>
+    <!-- Bagian Form -->
+    <div class="w-full md:w-1/2 flex flex-col justify-center">
+        <h2 class="text-2xl mb-6 text-center gradient-text">LOGIN</h2>
+        <form action="login_process.php" method="POST" class="space-y-4">
+            <div>
+                <label for="nama" class="block text-sm mb-1">Username:</label>
+                <input type="text" id="nama" name="nama" required
+                    class="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white">
             </div>
+            <div class="relative">
+                <label for="password" class="block text-sm mb-1">Password:</label>
+                <input type="password" id="password" name="password" required
+                    class="w-full px-4 py-2 rounded-md bg-white/20 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white">
+                <span class="absolute top-9 right-3 cursor-pointer text-gray-200" id="togglePassword">👁</span>
+            </div>
+            <button type="submit"
+                class="w-full flex items-center justify-center gap-2 bg-white text-black font-semibold py-2 rounded-md shadow-lg transform transition duration-300 hover:scale-105 hover:bg-gray-200">
+                🔐 Login
+            </button>
         </form>
-        <p class="mt-4 text-sm text-center text-gray-600 dark:text-gray-300">
-            Kembali Ke Beranda? <a href="../index.php" class="text-blue-600 hover:underline">Klik Disini</a>
+        <p class="mt-4 text-sm text-center">
+            Kembali ke beranda? <a href="../index.php" class="text-blue-300 hover:underline">Klik di sini</a>
         </p>
     </div>
 </div>
 
 <script>
-/* ===== Partikel Background ===== */
+/* === Particle Follow Mouse === */
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -91,7 +116,6 @@ canvas.height = window.innerHeight;
 
 let particles = [];
 const numParticles = 80;
-const maxDistance = 120;
 const mouse = { x: null, y: null };
 
 document.addEventListener('mousemove', (e) => {
@@ -103,21 +127,40 @@ class Particle {
     constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = 3;
-        this.speedX = (Math.random() - 0.5) * 1.5;
-        this.speedY = (Math.random() - 0.5) * 1.5;
+        this.size = 2;
+        this.baseX = this.x;
+        this.baseY = this.y;
+        this.density = Math.random() * 30 + 1;
     }
     draw() {
+        ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = '#fdfdfd';
+        ctx.closePath();
         ctx.fill();
     }
     update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        let dx = mouse.x - this.x;
+        let dy = mouse.y - this.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+        let maxDistance = 150;
+        let force = (maxDistance - distance) / maxDistance;
+        let directionX = dx / distance;
+        let directionY = dy / distance;
+
+        if (distance < maxDistance) {
+            this.x -= directionX * force * this.density * 0.2;
+            this.y -= directionY * force * this.density * 0.2;
+        } else {
+            if (this.x !== this.baseX) {
+                let dx = this.x - this.baseX;
+                this.x -= dx / 10;
+            }
+            if (this.y !== this.baseY) {
+                let dy = this.y - this.baseY;
+                this.y -= dy / 10;
+            }
+        }
     }
 }
 
@@ -127,48 +170,14 @@ function init() {
         particles.push(new Particle());
     }
 }
-
-function connect() {
-    for (let a = 0; a < particles.length; a++) {
-        for (let b = a; b < particles.length; b++) {
-            let dx = particles[a].x - particles[b].x;
-            let dy = particles[a].y - particles[b].y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < maxDistance) {
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-                ctx.lineWidth = 0.3;
-                ctx.beginPath();
-                ctx.moveTo(particles[a].x, particles[a].y);
-                ctx.lineTo(particles[b].x, particles[b].y);
-                ctx.stroke();
-            }
-        }
-        if (mouse.x && mouse.y) {
-            let dx = particles[a].x - mouse.x;
-            let dy = particles[a].y - mouse.y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < 150) {
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-                ctx.lineWidth = 0.4;
-                ctx.beginPath();
-                ctx.moveTo(particles[a].x, particles[a].y);
-                ctx.lineTo(mouse.x, mouse.y);
-                ctx.stroke();
-            }
-        }
-    }
-}
-
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach(p => {
-        p.update();
         p.draw();
+        p.update();
     });
-    connect();
     requestAnimationFrame(animate);
 }
-
 init();
 animate();
 window.addEventListener('resize', () => {
@@ -177,20 +186,18 @@ window.addEventListener('resize', () => {
     init();
 });
 
-/* ===== Toggle Show/Hide Password ===== */
+/* Toggle Password */
 const togglePassword = document.getElementById('togglePassword');
 const passwordField = document.getElementById('password');
-
 togglePassword.addEventListener('click', () => {
     const type = passwordField.type === 'password' ? 'text' : 'password';
     passwordField.type = type;
     togglePassword.textContent = type === 'password' ? '👁' : '🙈';
 });
 
-/* ===== Dark Mode Toggle ===== */
+/* Dark Mode Toggle */
 const darkModeToggle = document.getElementById('darkModeToggle');
 const body = document.body;
-
 darkModeToggle.addEventListener('click', () => {
     body.classList.toggle('dark-mode');
 });

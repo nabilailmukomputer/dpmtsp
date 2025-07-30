@@ -2,6 +2,12 @@
 include '../../db.php';
 session_start();
 
+if (!isset($_SESSION['user_id']) ) {
+    // Jika belum, redirect ke halaman login
+    header('Location: ../login.php');
+    exit;
+}
+
 // Ambil semua laporan harian
 $query = "SELECT dr.*, u.nama AS nama_pegawai 
           FROM daily_report dr 
@@ -22,71 +28,96 @@ $result = mysqli_query($conn, $query);
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .sidebar-collapsed {
+      width: 80px !important;
+    }
+    .sidebar-collapsed .menu-text,
+    .sidebar-collapsed h2 {
+      display: none;
+    }
+  </style>
 </head>
 
 <body class="bg-gray-100">
-    <div class="flex min-h-screen">
+    <div class="flex h-screen">
     <!-- Sidebar -->
-    <aside class="w-64 bg-[#0D2B53] text-white flex flex-col min-h-screen">
+        <aside id="sidebar" class="w-64 bg-[#0D2B53] text-white flex flex-col min-h-screen transition-all duration-300">
         <!-- Logo dan SIMANTAP -->
-        <div class="flex items-center px-6 py-6 text-xl font-bold space-x-2">
-            <img src="../../assets/s.png" alt="Logo" class="w-6 h-6" />
-            <span>SIMANTAP</span>
+      <div class="flex items-center justify-between px-6 py-6 text-xl font-bold">
+        <div class="flex items-center space-x-2">
+            <!-- <img src="../../assets/s.png" alt="Logo" class="w-6 h-6" /> -->
+          <span class="menu-text">SIMANTAP</span>
         </div>
 
-        <!-- Menu Admin -->
-        <nav class="mt-2 px-4">
-            <ul class="space-y-2 text-sm">
-                <li>
-                    <a href="dashboard.php"
-                        class="block py-2.5 px-2.5 font-bold rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1 mb-2">
-                        <span class="flex items-center gap-2">
-                            <span class="material-icons text-[#F7EDED]">menu_book</span>
-                            Dashboard
-                        </span>
-                    </a>
-                </li>
-            </ul>
-            <h2 class="text-[8px] font-bold text-gray-300 mb-2 ml-2">MENU UNTUK ADMIN</h2>
-            <ul class="space-y-2 text-sm">
-                <li>
-                    <a href="detail.php"
-                        class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Detail
-                        Tugas</a>
-                </li>
-                <li>
-                    <a href="laporan.php"
-                        class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Laporan
-                        Harian</a>
-                </li>
-                <li>
-                    <a href="tenggat.php"
-                        class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Permohonan
-                        Tenggat</a>
-                </li>
-                <li>
-                    <a href="kinerja_pegawai.php"
-                        class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kinerja
-                        Pegawai</a>
-                </li>
-                <li>
-                    <a href="kelola_admin.php"
-                        class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola
-                        Pengguna</a>
-                </li>
-                          <li>
-            <a href="kelola_bidang.php" class="block py-1 px-2 rounded hover:bg-orange-500 hover:text-white transition duration-300 hover:translate-x-1">Kelola Bidang</a>
-          </li>
-            </ul>
-        </nav>
+                <!-- Tombol Toggle -->
+        <button id="toggle-btn" class="text-white focus:outline-none">
+          <span class="material-icons">menu</span>
+        </button>
+      </div>
 
-        <div class="mt-auto px-4 py-4">
-            <a href="../logout.php"
-                class="flex items-center gap-2 text-white-500 hover:underline text-sm transition duration-300">
-                <span class="material-icons">logout</span>
-                <span>Logout</span>
+
+      <!-- Menu -->
+      <nav class="mt-2 px-4">
+        <ul class="space-y-2 text-sm">
+          <li>
+            <a href="dashboard.php"
+              class="flex items-center gap-2 py-2.5 px-2.5 font-bold rounded hover:bg-orange-500 transition duration-300">
+              <span class="material-icons text-[#F7EDED]">menu_book</span>
+              <span class="menu-text">Dashboard</span>
             </a>
-        </div>
+          </li>
+        </ul>
+        <h2 class="text-[8px] font-bold text-gray-300 mb-2 ml-2">MENU UNTUK ADMIN</h2>
+        <ul class="space-y-2 text-sm">
+          <li>
+            <a href="detail.php" class="flex items-center gap-2 py-1 px-2 rounded hover:bg-orange-500 transition">
+              <span class="material-icons">assignment</span>
+              <span class="menu-text">Detail Tugas</span>
+            </a>
+          </li>
+          <li>
+            <a href="laporan.php" class="flex items-center gap-2 py-1 px-2 rounded hover:bg-orange-500 transition">
+              <span class="material-icons">description</span>
+              <span class="menu-text">Laporan Harian</span>
+            </a>
+          </li>
+          <li>
+            <a href="tenggat.php" class="flex items-center gap-2 py-1 px-2 rounded hover:bg-orange-500 transition">
+              <span class="material-icons">schedule</span>
+              <span class="menu-text">Permohonan Tenggat</span>
+            </a>
+          </li>
+          <li>
+            <a href="kinerja_pegawai.php" class="flex items-center gap-2 py-1 px-2 rounded hover:bg-orange-500 transition">
+              <span class="material-icons">bar_chart</span>
+              <span class="menu-text">Kinerja Pegawai</span>
+            </a>
+          </li>
+          <li>
+            <a href="kelola_admin.php" class="flex items-center gap-2 py-1 px-2 rounded hover:bg-orange-500 transition">
+              <span class="material-icons">manage_accounts</span>
+              <span class="menu-text">Kelola Pengguna</span>
+            </a>
+          </li>
+          <li>
+            <a href="kelola_bidang.php" class="flex items-center gap-2 py-1 px-2 rounded hover:bg-orange-500 transition">
+              <span class="material-icons">apartment</span>
+              <span class="menu-text">Kelola Bidang</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="mt-auto px-4 py-4">
+        <a href="../logout.php" class="flex items-center gap-2 text-sm hover:underline">
+          <span class="material-icons">logout</span>
+          <span class="menu-text">Logout</span>
+        </a>
+      </div>
     </aside>
 
     <main class="flex-1 p-6 overflow-auto">
@@ -115,6 +146,17 @@ $result = mysqli_query($conn, $query);
             </table>
         </div>
     </div>
+
+      <!-- JavaScript untuk Toggle Sidebar -->
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggle-btn');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('sidebar-collapsed');
+    });
+  </script>
+
 </body>
 
 </html>
