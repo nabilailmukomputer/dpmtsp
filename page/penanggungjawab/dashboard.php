@@ -1,10 +1,22 @@
+<?php
+include '../../db.php';
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../login.php');
+    exit;
+}
+
+
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard SIMANTAP</title>
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard SIMANTAP</title>
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f5f5f5;
@@ -16,34 +28,118 @@
     .sidebar {
       width: 250px;
       background: #002244;
-      color: white; 
+      color: white;
       height: 100vh;
       padding: 20px;
       position: fixed;
       left: 0;
       top: 0;
+      transition: width 0.3s ease;
+      overflow: hidden;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar.collapsed {
+      width: 80px;
     }
 
     .sidebar h2 {
       text-align: center;
       margin-bottom: 20px;
+      font-size: 22px;
+      transition: opacity 0.3s ease;
     }
 
-    .sidebar button {
-      background: orange;
+    .sidebar.collapsed h2 {
+      opacity: 0;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar ul li {
+      margin: 15px 0;
+    }
+
+    .sidebar ul li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       color: white;
-      border: none;
-      padding: 10px;
-      width: 100%;
-      border-radius: 5px;
+      text-decoration: none;
       font-size: 16px;
-      cursor: pointer;
-      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 6px;
+      transition: background 0.3s ease, transform 0.3s ease;
     }
 
-    .sidebar p {
-      font-size: 14px;
-      margin-top: 10px;
+    .sidebar ul li a:hover {
+      background: #004080;
+      transform: scale(1.05);
+    }
+
+    .menu-text {
+      transition: opacity 0.3s ease;
+    }
+
+    /* Logout button style */
+    .logout-btn {
+      margin-top: auto;
+      margin-bottom: 20px; /* ✅ Naikkan 20px dari bawah */
+      border-top: 1px solid #004080;
+      padding-top: 15px;
+    }
+
+    .logout-btn a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff; /* ✅ Ubah tulisan Logout jadi putih */
+      font-weight: bold;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 6px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .logout-btn a:hover {
+      background: #ff9800;
+      color: white;
+    }
+
+    /* Toggle Sidebar Button */
+    .toggle-btn {
+      position: absolute;
+      top: 15px;
+      left: 250px;
+      background: #ff9800;
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toggle-btn:hover {
+      background: #e68a00;
+      transform: scale(1.1);
+    }
+
+    .toggle-btn i {
+      font-size: 20px;
+      color: white;
+      transition: transform 0.3s ease;
     }
 
     /* Content */
@@ -51,6 +147,7 @@
       margin-left: 270px;
       padding: 20px;
       flex: 1;
+      transition: margin-left 0.3s ease;
     }
 
     .content h2 {
@@ -114,69 +211,120 @@
     /* Responsive */
     @media (max-width: 768px) {
       .sidebar {
-        width: 200px;
+        left: -250px;
       }
-      .content {
-        margin-left: 220px;
-      }
-    }
 
-    @media (max-width: 576px) {
-      .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
+      .sidebar.show {
+        left: 0;
       }
+
+      .toggle-btn {
+        left: 15px;
+      }
+
       .content {
         margin-left: 0;
       }
-      .card-container {
-        justify-content: center;
-      }
     }
-  </style>
+</style>
 </head>
 <body>
+  
 
 <!-- Sidebar -->
-<div class="sidebar">
-  <h2>SIMANTAP</h2>
-  <button>Dashboard</button>
-  <p>MENU UNTUK PENANGGUNG JAWAB</p>
+<div class="sidebar" id="sidebar">
+  <div>
+    <h2>SIMANTAP</h2>
+    <ul>
+      <li><a href="kesekretariatan.php"><i class="fa-solid fa-folder"></i> <span class="menu-text">Kesekretariatan</span></a></li>
+      <li><a href="pelayanan.php"><i class="fa-solid fa-gear"></i> <span class="menu-text">Pelayanan</span></a></li>
+      <li><a href="penanaman modal.php"><i class="fa-solid fa-building"></i> <span class="menu-text">Penanaman Modal</span></a></li>
+      <li><a href="tambah.php"><i class="fa-solid fa-building"></i> <span class="menu-text">Tambah Tugas</span></a></li>
+      <li><a href="permohonan_tenggat.php"><i class="fa-solid fa-building"></i> <span class="menu-text">Permohonan Tenggat</span></a></li>
+    </ul>
+  </div>
+  <div class="logout-btn">
+    <a href="login.php" onclick="confirmLogout(event)">
+      <i class="fa-solid fa-right-from-bracket"></i> 
+      <span class="menu-text">Logout</span>
+    </a>
+  </div>
 </div>
 
+<!-- Tombol Toggle Sidebar -->
+<button class="toggle-btn" id="toggle-btn">
+  <i class="fa-solid fa-bars"></i>
+</button>
+
 <!-- Content -->
-<div class="content">
+<div class="content" id="content">
   <h2>📚 Dashboard</h2>
   <div class="card-container">
-    <!-- Kesekretariatan -->
     <div class="card">
-      <img src="../../assets/images.png" alt="Kesekretariatan">
+      <img src="../../assets/kesekretariatan.jpeg" alt="Kesekretariatan">
       <div class="card-title">Kesekretariatan</div>
       <div class="card-footer">
         <a href="kesekretariatan.php" class="lihat-btn">Lihat &gt;</a>
       </div>
     </div>
 
-    <!-- Layanan -->
     <div class="card">
-      <img src="../../assets/images.jpeg" alt="Layanan">
-      <div class="card-title">Layanan</div>
+      <img src="../../assets/pelayanan.jpeg" alt="Layanan">
+      <div class="card-title">Pelayanan</div>
       <div class="card-footer">
-        <a href="layanan.php" class="lihat-btn">Lihat &gt;</a>
+        <a href="pelayanan.php" class="lihat-btn">Lihat &gt;</a>
       </div>
     </div>
 
-    <!-- Penanaman Modal -->
     <div class="card">
-      <img src="../../assets/lala.jpeg" alt="Penanaman Modal">
+      <img src="../../assets/penanaman.jpeg" alt="Penanaman Modal">
       <div class="card-title">Penanaman Modal</div>
       <div class="card-footer">
-        <a href="penanaman.php" class="lihat-btn">Lihat &gt;</a>
+        <a href="penanaman modal.php" class="lihat-btn">Lihat &gt;</a>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+const sidebar = document.getElementById('sidebar');
+const toggleBtn = document.getElementById('toggle-btn');
+const content = document.getElementById('content');
+const icon = toggleBtn.querySelector('i');
+
+toggleBtn.addEventListener('click', () => {
+  if (window.innerWidth > 768) {
+    sidebar.classList.toggle('collapsed');
+    if (sidebar.classList.contains('collapsed')) {
+      content.style.marginLeft = '100px';
+      toggleBtn.style.left = '90px';
+      icon.classList.remove('fa-bars');
+      icon.classList.add('fa-arrow-right');
+      document.querySelectorAll('.menu-text').forEach(el => el.style.display = 'none');
+    } else {
+      content.style.marginLeft = '270px';
+      toggleBtn.style.left = '250px';
+      icon.classList.remove('fa-arrow-right');
+      icon.classList.add('fa-bars');
+      document.querySelectorAll('.menu-text').forEach(el => el.style.display = 'inline');
+    }
+  } else {
+    sidebar.classList.toggle('show');
+  }
+
+  icon.style.transform = 'rotate(180deg)';
+  setTimeout(() => {
+    icon.style.transform = 'rotate(0deg)';
+  }, 300);
+});
+
+function confirmLogout(event) {
+  event.preventDefault();
+  if (confirm("Apakah Anda yakin ingin logout?")) {
+    window.location.href = "../logout.php";
+  }
+}
+</script>
 
 </body>
 </html>

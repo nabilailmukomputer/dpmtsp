@@ -7,10 +7,11 @@ if (!isset($_SESSION['user_id']) ) {
     exit;
 }
 // Ambil semua permohonan beserta nama pegawai & judul tugas
-$query = "SELECT dr.*, t.judul, u.nama AS pemohon
+$query = "SELECT dr.*, t.judul, u.nama AS pemohon, b.nama
           FROM deadline_request dr
           JOIN task t ON dr.task_id = t.id
           JOIN user u ON dr.requested_by = u.id
+          JOIN bidang b ON u.bidang_id = b.id
           ORDER BY dr.requested_deadline DESC";
 $result = mysqli_query($conn, $query);
 ?>

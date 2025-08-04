@@ -2,12 +2,21 @@
 session_start();
 include '../../db.php';
 
-
-if (!isset($_SESSION['user_id']) ) {
-    // Jika belum, redirect ke halaman login
+if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
     exit;
 }
+
+// Ambil semua user + bidang
+$sql = "
+SELECT user.id, user.nama, bidang.nama AS nama_bidang
+FROM user
+JOIN bidang ON user.bidang_id = bidang.id
+ORDER BY bidang.nama, user.nama
+";
+$result_users = $conn->query($sql);
+
+// List Role
 $roles = [
     'admin' => 'Admin',
     'penanggung jawab' => 'Penanggung Jawab',
@@ -15,43 +24,48 @@ $roles = [
     'ketua divisi' => 'Ketua Divisi',
     'anggota' => 'Anggota'
 ];
-// Pastikan parameter bidang ada
-if (!isset($_GET['bidang'])) {
-    die("Parameter bidang tidak ditemukan!");
-}
-$bidang = $_GET['bidang'];
+
+// Ambil bidang dari URL hanya untuk judul (tidak untuk input database)
+$bidang_url = isset($_GET['bidang']) ? mysqli_real_escape_string($conn, $_GET['bidang']) : '';
 
 // Proses simpan data
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $judul = mysqli_real_escape_string($conn, $_POST['judul']);
     $deskripsi = mysqli_real_escape_string($conn, $_POST['deskripsi']);
-    $tanggal_tugas = mysqli_real_escape_string($conn, $_POST['tanggal_tugas']);
+    $tanggal_tugas = $_POST['tanggal_tugas'];
     $deadline_date = $_POST['deadline_date'];
     $deadline_time = $_POST['deadline_time'];
-    $deadline = $deadline_date . ' ' . $deadline_time . ':00'; 
-    $created_by=mysqli_real_escape_string($conn,$_POST['created_by']);
-    $assigned_to = mysqli_real_escape_string($conn, $_POST['assigned_to']);
-    $bidang_user=mysqli_real_escape_string($conn,$_POST['bidang_user']);
-     $role_user=mysqli_real_escape_string($conn,$_POST['role_user']);
-    $status = mysqli_real_escape_string($conn, $_POST['status']);
-    
-    // Ambil nama user dari session
-    $created_by = $_SESSION['nama_user'];
-    $bidang_user = $bidang;
+    $deadline = $deadline_date . ' ' . $deadline_time . ':00';
+    $assigned_to = $_POST['assigned_to'];
+    $role_user = $_POST['role_user'];
+    $status = $_POST['status'];
+    $created_by = isset($_SESSION['nama']) ? $_SESSION['nama'] : 'Admin';
 
-    $query = "INSERT INTO task (judul, deskripsi, tanggal_tugas, deadline, created_by, assigned_to, bidang_user, role_user,  status)
-              VALUES ('$judul', '$deskripsi', '$tanggal_tugas', '$deadline', '$created_by', '$assigned_to', '$bidang_user', '$role_user',  '$status')";
-              
+    // ✅ Ambil nama bidang dari assigned_to
+    $sqlBidang = "
+        SELECT b.nama AS nama_bidang
+        FROM user u
+        JOIN bidang b ON u.bidang_id = b.id
+        WHERE u.id = '$assigned_to'
+    ";
+    $resBidang = mysqli_query($conn, $sqlBidang);
+    $dataBidang = mysqli_fetch_assoc($resBidang);
+    $bidang_user = $dataBidang ? $dataBidang['nama_bidang'] : '';
 
-    if (mysqli_query($conn, $query)) {
-        header("Location: {$bidang}.php?success=1");
+    $stmt = $conn->prepare("
+        INSERT INTO task (judul, deskripsi, tanggal_tugas, deadline, created_by, assigned_to, bidang_user, role_user, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->bind_param("sssssssss", $judul, $deskripsi, $tanggal_tugas, $deadline, $created_by, $assigned_to, $bidang_user, $role_user, $status);
+
+    if ($stmt->execute()) {
+        header("Location: dashboard.php?success=1&bidang=" . urlencode($bidang_user));
         exit;
     } else {
-        echo "Error: " . mysqli_error($conn);
+        echo "<div class='alert alert-danger'>Error: " . htmlspecialchars($stmt->error) . "</div>";
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -62,9 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body class="p-4 bg-light">
 <div class="container">
-    <h1 class="mb-4">Tambah Tugas - Bidang: <?php echo htmlspecialchars($bidang); ?></h1>
-    <form method="POST" class="p-4 border rounded bg-white shadow">
-        <!-- Judul Tugas -->
+    <h1 class="mb-4">Tambah Tugas<?= $bidang_url ? ' - Bidang: ' . htmlspecialchars($bidang_url) : '' ?></h1>
+    <form method="POST" action="?bidang=<?= urlencode($bidang_url); ?>" class="p-4 border rounded bg-white shadow">
+
+        <!-- Judul -->
         <div class="mb-3">
             <label class="form-label">Judul Tugas</label>
             <input type="text" name="judul" class="form-control" required>
@@ -94,24 +109,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <!-- Ditugaskan Kepada -->
         <div class="mb-3">
             <label class="form-label">Ditugaskan Kepada</label>
-            <input type="text" name="assigned_to" class="form-control" required>
+            <select name="assigned_to" class="form-control" required>
+                <option value="">-- Pilih Pegawai --</option>
+                <?php while ($user = $result_users->fetch_assoc()): ?>
+                    <option value="<?= htmlspecialchars($user['id']); ?>">
+                        <?= htmlspecialchars($user['nama']); ?> (<?= htmlspecialchars($user['nama_bidang']); ?>)
+                    </option>
+                <?php endwhile; ?>
+            </select>
         </div>
 
-
+        <!-- Role -->
         <div class="mb-3">
-            <label class="form-label">Diberikan Oleh</label>
-            <input type="text" name="created_by" class="form-control" required>
-        </div>
-
-        <label class="block mb-2 font-semibold">Role</label>
-            <select name="role_user" required class="w-full mb-4 p-2 border rounded">
+            <label class="form-label">Role</label>
+            <select name="role_user" class="form-control" required>
                 <option value="">-- Pilih Role --</option>
                 <?php foreach ($roles as $key => $label): ?>
-                    <option value="<?= $key ?>" <?= $roles == $key ? 'selected' : '' ?>>
-                        <?= $label ?>
-                    </option>
+                    <option value="<?= $key ?>"><?= $label ?></option>
                 <?php endforeach; ?>
             </select>
+        </div>
 
         <!-- Status -->
         <div class="mb-3">
@@ -123,9 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </select>
         </div>
 
-        <!-- Tombol -->
         <button type="submit" class="btn btn-success">Simpan Tugas</button>
-        <a href="<?php echo $bidang; ?>.php" class="btn btn-secondary">Kembali</a>
+        <a href="dashboard.php" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
 </body>

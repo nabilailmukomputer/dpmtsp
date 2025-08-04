@@ -18,8 +18,7 @@ if ($data) {
     $_SESSION['role']      = $data['role'];      // Role
     $_SESSION['bidang']    = $data['bidang'];    // Nama bidang
     $_SESSION['bidang_id'] = $data['bidang_id']; // Jika ada kolom ini di DB
-
-    session_regenerate_id(true);
+   
 
     // Mapping role
     $routes = [

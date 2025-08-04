@@ -45,7 +45,7 @@ if (!in_array($page, $valid_pages)) {
             <ul class="space-y-2 text-sm">
                 <li><a href="dashboard.php" class="flex items-center gap-2 py-2 px-2 hover:bg-orange-500 rounded"><span class="material-icons">menu_book</span><span class="menu-text">Dashboard</span></a></li>
             </ul>
-            <h2 class="text-[8px] font-bold text-gray-300 mb-2 ml-2">MENU UNTUK ADMIN</h2>
+            <h2 class="text-[8px] font-bold text-gray-300 mb-2 ml-2">MENU UNTUK PJ</h2>
             <ul class="space-y-2 text-sm">
                 <li><a href="?page=semua" class="flex items-center gap-2 py-1 px-2 rounded hover:bg-orange-500 <?= $page=='semua'?'bg-orange-500':'' ?>"><span class="material-icons">assignment</span><span class="menu-text">Semua Tugas</span></a></li>
                 <li><a href="?page=orang" class="flex items-center gap-2 py-1 px-2 rounded hover:bg-orange-500 <?= $page=='orang'?'bg-orange-500':'' ?>"><span class="material-icons">people</span><span class="menu-text">Pegawai</span></a></li>
@@ -59,7 +59,7 @@ if (!in_array($page, $valid_pages)) {
 
     <!-- Main Content -->
     <main class="flex-1 p-6 overflow-y-auto">
-        <h2 class="text-2xl font-bold mb-4">📋 Dashboard Kesekretariatan</h2>
+        <h2 class="text-2xl font-bold mb-4">📋 Dashboard Pelayanan</h2>
 
         <?php if ($page == 'semua'): ?>
             <h3 class="text-lg font-semibold mb-3">📌 Semua Tugas</h3>
@@ -81,7 +81,7 @@ if (!in_array($page, $valid_pages)) {
                             FROM task t
                             JOIN user u ON t.assigned_to = u.id
                             JOIN bidang b ON u.bidang_id = b.id
-                            WHERE b.nama = 'Kesekretariatan'
+                            WHERE b.nama = 'Penanaman Modal'
                             ORDER BY t.deadline ASC
                         ");
                         if (mysqli_num_rows($query) > 0):
@@ -109,7 +109,7 @@ if (!in_array($page, $valid_pages)) {
                     SELECT u.id, u.nama 
                     FROM user u
                     JOIN bidang b ON u.bidang_id = b.id
-                    WHERE b.nama = 'Kesekretariatan'
+                    WHERE b.nama = 'Penanaman Modal'
                 ");
                 if (mysqli_num_rows($query) > 0):
                     while ($row = mysqli_fetch_assoc($query)):
@@ -131,7 +131,7 @@ if (!in_array($page, $valid_pages)) {
                     SELECT judul, deadline 
                     FROM task t
                     JOIN bidang b ON t.bidang_user = b.id
-                    WHERE b.nama = 'Kesekretariatan' AND t.status = 'selesai'
+                    WHERE b.nama = 'Penanaman Modal' AND t.status = 'selesai'
                 ");
                 if (mysqli_num_rows($query) > 0):
                     while ($row = mysqli_fetch_assoc($query)):

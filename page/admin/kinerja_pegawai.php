@@ -2,38 +2,40 @@
 include '../../db.php';
 session_start();
 
-if (!isset($_SESSION['user_id']) ) {
-    // Jika belum, redirect ke halaman login
+if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
     exit;
 }
+
 // Ambil bidang dari GET
 $bidang = isset($_GET['bidang']) ? mysqli_real_escape_string($conn, $_GET['bidang']) : '';
 
 // Base query
 $query = "SELECT
-        u.id,
-        u.nama,
-        u.role,
-        SUM(CASE WHEN t.status = 'selesai' THEN 1 ELSE 0 END) AS selesai,
-        SUM(CASE WHEN t.status = 'dikerjakan' THEN 1 ELSE 0 END) AS dikerjakan,
-        SUM(CASE WHEN t.status = 'terlambat' THEN 1 ELSE 0 END) AS terlambat,
-        COUNT(t.id) AS total
-    FROM user u
-    LEFT JOIN task t ON u.nama = t.assigned_to AND u.role = t.role_user
-";
+            u.id,
+            u.nama,
+            u.role,
+            SUM(CASE WHEN t.status = 'selesai' THEN 1 ELSE 0 END) AS selesai,
+            SUM(CASE WHEN t.status = 'dikerjakan' THEN 1 ELSE 0 END) AS dikerjakan,
+            SUM(CASE WHEN t.status = 'terlambat' THEN 1 ELSE 0 END) AS terlambat,
+            COUNT(t.id) AS total
+        FROM user u
+        LEFT JOIN task t ON u.id = t.assigned_to"; // Pastikan pakai ID
 
 // Jika ada filter bidang
 if ($bidang !== '') {
     $query .= " WHERE u.bidang_id = '$bidang'";
 }
 
-// Tambahkan GROUP BY & ORDER BY
-$query .= " GROUP BY u.id, u.nama, u.role ORDER BY u.nama ASC";
+// Tambahkan GROUP BY
+$query .= " GROUP BY u.id, u.nama, u.role";
 
-$result = mysqli_query($conn, $query) or die(mysqli_error($conn));
+// Jalankan query
+$result = mysqli_query($conn, $query);
+if (!$result) {
+    die("Query gagal: " . mysqli_error($conn));
+}
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">

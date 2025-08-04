@@ -2,6 +2,13 @@
 // Ambil koneksi database
 include '../../db.php';
 
+session_start();
+if (!isset($_SESSION['nama']) ) {
+    // Jika belum, redirect ke halaman login
+    header('Location: ../login.php');
+    exit;
+}
+
 
 // Total semua tugas
 $result = mysqli_query($conn, "SELECT COUNT(*) AS status FROM task");
@@ -131,7 +138,9 @@ $terlambat = $data['status'];
           <h1 class="text-xl font-semibold">Dashboard - Admin</h1>
         </div>
         <div class="flex items-center">
-          <span class="mr-2 font-medium">Users</span>
+          <span class="mr-2 font-medium">
+    <?php echo isset($_SESSION['nama']) ? $_SESSION['nama'] : 'User'; ?>
+</span>
           <img src="../../assets/lala.jpeg" alt="User" class="w-8 h-8 rounded-full object-cover"/>
         </div>
       </div>

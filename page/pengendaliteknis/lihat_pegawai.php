@@ -95,7 +95,7 @@ function getTasksByPegawai($conn, $pegawai) {
             <p class="text-muted">Tidak ada pegawai di bidang ini.</p>
         <?php endif; ?>
     </div>
-    <a href="<?php echo $bidang; ?>.php" class="btn btn-secondary mt-3">Kembali</a>
+    <a href="dashboard.php" class="btn btn-secondary mt-3">Kembali</a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

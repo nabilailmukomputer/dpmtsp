@@ -1,11 +1,28 @@
 <?php
 session_start();
 include '../../db.php';
-if (!isset($_SESSION['user_id']) ) {
-    // Jika belum, redirect ke halaman login
+
+// Pastikan user sudah login
+if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
     exit;
 }
+
+// Ambil bidang user dari session
+$bidang = $_SESSION['bidang_id'];
+$user_id = $_SESSION['user_id'];
+
+// Ambil pegawai sesuai bidang
+$queryPegawai = "
+    SELECT u.id, u.nama, b.nama AS bidang_nama
+    FROM user u
+    JOIN bidang b ON u.bidang_id = b.id
+    WHERE u.role = 'Anggota' AND u.bidang_id = '$bidang'
+";
+
+$pegawai = mysqli_query($conn, $queryPegawai);
+
+// Daftar role
 $roles = [
     'admin' => 'Admin',
     'penanggung jawab' => 'Penanggung Jawab',
@@ -14,10 +31,32 @@ $roles = [
     'anggota' => 'Anggota'
 ];
 
-// Ambil pegawai sesuai bidang
-$bidang = $_SESSION['bidang_id'];
-$queryPegawai = "SELECT * FROM user WHERE role='Anggota' AND bidang_id='$bidang'";
-$pegawai = mysqli_query($conn, $queryPegawai);
+// Proses simpan data
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $judul = mysqli_real_escape_string($conn, $_POST['judul']);
+    $deskripsi = mysqli_real_escape_string($conn, $_POST['deskripsi']);
+    $tanggal_tugas = $_POST['tanggal_tugas'];
+    $deadline_date = $_POST['deadline_date'];
+    $deadline_time = $_POST['deadline_time'];
+    $assigned_to = $_POST['assigned_to'];
+    $created_by = $_SESSION['nama']; // Ambil nama user yang login
+    $role_user = $_POST['role_user'];
+    $status = $_POST['status'];
+
+    // Gabungkan tanggal dan waktu deadline
+    $deadline = $deadline_date . ' ' . $deadline_time;
+
+    // Simpan ke database
+    $queryInsert = "INSERT INTO task (judul, deskripsi, tanggal_tugas, deadline, assigned_to, created_by, role_user, status, bidang_user) 
+                    VALUES ('$judul', '$deskripsi', '$tanggal_tugas', '$deadline', '$assigned_to', '$created_by', '$role_user', '$status', '$bidang')";
+    
+    if (mysqli_query($conn, $queryInsert)) {
+        header("Location: $bidang.php?success=1");
+        exit;
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,6 +69,7 @@ $pegawai = mysqli_query($conn, $queryPegawai);
 <body class="p-4 bg-light">
 <div class="container">
     <h1 class="mb-4">Tambah Tugas - Bidang: <?php echo htmlspecialchars($bidang); ?></h1>
+
     <form method="POST" class="p-4 border rounded bg-white shadow">
         <!-- Judul Tugas -->
         <div class="mb-3">
@@ -61,38 +101,38 @@ $pegawai = mysqli_query($conn, $queryPegawai);
         <!-- Ditugaskan Kepada -->
         <div class="mb-3">
             <label class="form-label">Ditugaskan Kepada</label>
-            <input type="text" name="assigned_to" class="form-control" required>
+            <select name="assigned_to" class="form-control" required>
+                <option value="">-- Pilih Pegawai --</option>
+                <?php while($row = mysqli_fetch_assoc($pegawai)): ?>
+                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['nama']) ?></option>
+                <?php endwhile; ?>
+            </select>
         </div>
 
-
+        <!-- Role -->
         <div class="mb-3">
-            <label class="form-label">Diberikan Oleh</label>
-            <input type="text" name="created_by" class="form-control" required>
-        </div>
-
-        <label class="block mb-2 font-semibold">Role</label>
-            <select name="role_user" required class="w-full mb-4 p-2 border rounded">
+            <label class="form-label">Role</label>
+            <select name="role_user" class="form-control" required>
                 <option value="">-- Pilih Role --</option>
                 <?php foreach ($roles as $key => $label): ?>
-                    <option value="<?= $key ?>" <?= $roles == $key ? 'selected' : '' ?>>
-                        <?= $label ?>
-                    </option>
+                    <option value="<?= $key ?>"><?= $label ?></option>
                 <?php endforeach; ?>
             </select>
+        </div>
 
         <!-- Status -->
         <div class="mb-3">
             <label class="form-label">Status</label>
             <select name="status" class="form-control" required>
-                <option value="Dikerjakan">Dikerjakan</option>
-                <option value="Selesai">Selesai</option>
-                <option value="Terlambat">Terlambat</option>
+                <option value="dikerjakan">Dikerjakan</option>
+                <option value="selesai">Selesai</option>
+                <option value="terlambat">Terlambat</option>
             </select>
         </div>
 
         <!-- Tombol -->
         <button type="submit" class="btn btn-success">Simpan Tugas</button>
-        <a href="<?php echo $bidang; ?>.php" class="btn btn-secondary">Kembali</a>
+        <a href="<?= $bidang ?>.php" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
 </body>
