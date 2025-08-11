@@ -9,9 +9,14 @@ if (!isset($_SESSION['user_id']) ) {
 }
 
 // Ambil semua laporan harian
-$query = "SELECT dr.*, u.nama AS nama_pegawai 
-          FROM daily_report dr 
-          JOIN user u ON dr.user_id = u.id 
+$query = "SELECT dr.id,
+                 dr.tanggal,
+                 dr.file_lampiran,
+                 u.nama AS nama_pegawai,
+                 t.judul AS judul_task
+          FROM daily_report dr
+          JOIN user u ON dr.user_id = u.id
+          JOIN task t ON dr.task_id = t.id
           ORDER BY dr.tanggal DESC";
 
 $result = mysqli_query($conn, $query);
@@ -130,6 +135,7 @@ $result = mysqli_query($conn, $query);
                 <thead class="bg-gray-200 text-gray-600">
                     <tr>
                         <th class="py-3 px-4 border">Nama Pegawai</th>
+                        <th class="py-3 px-4 border">Judul Tugas</th>
                         <th class="py-3 px-4 border">Tanggal</th>
                         <th class="py-3 px-4 border">Laporan</th>
                     </tr>
@@ -138,8 +144,9 @@ $result = mysqli_query($conn, $query);
                     <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                     <tr class="hover:bg-gray-100">
                         <td class="py-2 px-4 border"><?= htmlspecialchars($row['nama_pegawai']) ?></td>
+                        <td class="py-2 px-4 border"><?= htmlspecialchars($row['judul_task']) ?></td>
                         <td class="py-2 px-4 border"><?= htmlspecialchars($row['tanggal']) ?></td>
-                        <td class="py-2 px-4 border"><?= nl2br(htmlspecialchars($row['laporan'])) ?></td>
+                        <td class="py-2 px-4 border"><?= nl2br(htmlspecialchars($row['file_lampiran'])) ?></td>
                     </tr>
                     <?php } ?>
                 </tbody>

@@ -1,7 +1,7 @@
 <?php
 include '../../db.php';
 
-
+session_start();
 if (!isset($_SESSION['user_id']) ) {
     // Jika belum, redirect ke halaman login
     header('Location: ../login.php');

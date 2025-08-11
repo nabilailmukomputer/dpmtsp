@@ -7,6 +7,9 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+
+
+
 // Ambil semua user + bidang
 $sql = "
 SELECT user.id, user.nama, bidang.nama AS nama_bidang
@@ -32,7 +35,6 @@ $bidang_url = isset($_GET['bidang']) ? mysqli_real_escape_string($conn, $_GET['b
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $judul = mysqli_real_escape_string($conn, $_POST['judul']);
     $deskripsi = mysqli_real_escape_string($conn, $_POST['deskripsi']);
-    $tanggal_tugas = $_POST['tanggal_tugas'];
     $deadline_date = $_POST['deadline_date'];
     $deadline_time = $_POST['deadline_time'];
     $deadline = $deadline_date . ' ' . $deadline_time . ':00';
@@ -53,10 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $bidang_user = $dataBidang ? $dataBidang['nama_bidang'] : '';
 
     $stmt = $conn->prepare("
-        INSERT INTO task (judul, deskripsi, tanggal_tugas, deadline, created_by, assigned_to, bidang_user, role_user, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO task (judul, deskripsi,  deadline, created_by, assigned_to, bidang_user, role_user, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ");
-    $stmt->bind_param("sssssssss", $judul, $deskripsi, $tanggal_tugas, $deadline, $created_by, $assigned_to, $bidang_user, $role_user, $status);
+    $stmt->bind_param("ssssssss", $judul, $deskripsi,  $deadline, $created_by, $assigned_to, $bidang_user, $role_user, $status);
 
     if ($stmt->execute()) {
         header("Location: dashboard.php?success=1&bidang=" . urlencode($bidang_user));
@@ -91,12 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <textarea name="deskripsi" class="form-control" required></textarea>
         </div>
 
-        <!-- Tanggal Tugas -->
-        <div class="mb-3">
-            <label class="form-label">Tanggal Tugas</label>
-            <input type="date" name="tanggal_tugas" class="form-control" required>
-        </div>
-
+       
         <!-- Deadline -->
         <div class="mb-3">
             <label class="form-label">Deadline</label>

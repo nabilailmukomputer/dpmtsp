@@ -20,7 +20,7 @@ $bidang_nama = ($resultBidang && mysqli_num_rows($resultBidang) > 0)
 // Ambil 5 tugas terbaru
 $tugas_query = mysqli_query($conn, "SELECT judul, deadline, status 
     FROM task 
-    WHERE bidang_user='$bidang_id' 
+    WHERE bidang_user='$bidang_nama' 
     ORDER BY tanggal_tugas DESC 
     LIMIT 5");
 ?>

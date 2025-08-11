@@ -1,10 +1,14 @@
 <?php
 include '../../db.php';
 
-$id = intval($_GET['id']);
-$query = "SELECT status FROM task WHERE id = $id";
-$result = mysqli_query($conn, $query);
-$row = mysqli_fetch_assoc($result);
+if (isset($_GET['id'])) {
+    $id = intval($_GET['id']);
 
-echo json_encode(['status' => $row['status']]);
+    $query = mysqli_query($conn, "SELECT status FROM task WHERE id = $id");
+    $data = mysqli_fetch_assoc($query);
+
+    echo json_encode([
+        'status' => $data['status']
+    ]);
+}
 ?>

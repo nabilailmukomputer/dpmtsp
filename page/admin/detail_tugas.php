@@ -35,17 +35,19 @@ $result = mysqli_query($conn, $query);
     </p>
 
     <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-            <thead>
-                <tr class="bg-blue-600 text-white">
-                    <th class="py-3 px-4 text-left">No</th>
-                    <th class="py-3 px-4 text-left">Nama Tugas</th>
-                    <th class="py-3 px-4 text-left">Status</th>
-                    <th class="py-3 px-4 text-left">Deadline</th>
-                    <th class="py-3 px-4 text-left">Sisa Waktu</th>
-                </tr>
-            </thead>
-            <tbody>
+       <table class="w-full">
+                <thead>
+                    <tr class="bg-blue-600 text-white">
+                    <th class="px-4 py-2 text-left">No</th>
+                    <th class="px-4 py-2 text-left">Nama Tugas</th>
+                    <th class="px-4 py-2 text-left">Status</th>
+                    <th class="px-4 py-2 text-left">Deadline</th>
+                    </tr>
+                </thead>
+                <tbody>
+    <!-- baris data -->
+  
+
                 <?php
                 if (mysqli_num_rows($result) > 0) {
                     $no = 1;
@@ -70,8 +72,8 @@ $result = mysqli_query($conn, $query);
                             </td>
                             <td class="py-2 px-4"><?= htmlspecialchars($row['deadline']); ?></td>
                             <td class="py-2 px-4 text-green-600 font-bold countdown"
-                                data-deadline="<?= htmlspecialchars($row['deadline']); ?>"
-                                data-status="<?= strtolower($row['status']); ?>">
+                                data-deadline="<?= htmlspecialchars($row['deadline']); ?>">
+                               
                             </td>
                         </tr>
                     <?php }
@@ -85,39 +87,7 @@ $result = mysqli_query($conn, $query);
     </div>
 </div>
 
-<script>
-// Parsing tanggal deadline format "YYYY-MM-DD HH:MM:SS" agar tidak salah timezone
-function parseLocalDateTime(str) {
-    let parts = str.split(/[- :]/);
-    return new Date(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]);
-}
 
-function updateCountdown() {
-    document.querySelectorAll(".countdown").forEach(el => {
-        let deadline = parseLocalDateTime(el.dataset.deadline);
-        let now = new Date();
-        let diff = deadline - now;
-
-        if (diff > 0) {
-            let hours = Math.floor(diff / (1000 * 60 * 60));
-            let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            let seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            el.textContent = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-        } else {
-            el.textContent = "Waktu Habis";
-
-            // Jika belum selesai, ubah status jadi Terlambat
-            if (el.dataset.status !== 'selesai') {
-                let statusCell = el.closest('tr').querySelector('.status');
-                statusCell.innerHTML = '<span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm">Terlambat</span>';
-            }
-        }
-    });
-}
-
-setInterval(updateCountdown, 1000);
-updateCountdown();
-</script>
 
 </body>
 </html>

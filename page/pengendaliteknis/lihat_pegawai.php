@@ -1,42 +1,36 @@
 <?php
 session_start();
 include '../../db.php';
-if (!isset($_SESSION['user_id']) ) {
-    // Jika belum, redirect ke halaman login
+
+// Pastikan user login
+if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
     exit;
 }
 
 $bidang = $_SESSION['bidang_id'];
 
-// Ambil pegawai sesuai bidang
-$pegawaiQuery = "SELECT nama FROM user WHERE bidang_id='$bidang'";
+// Ambil nama bidang
+$bidangResult = mysqli_query($conn, "SELECT nama FROM bidang WHERE id='$bidang'");
+$bidangNama = ($bidangResult && mysqli_num_rows($bidangResult) > 0) 
+    ? mysqli_fetch_assoc($bidangResult)['nama'] 
+    : 'Tidak Diketahui';
+
+// Ambil pegawai di bidang
+$pegawaiQuery = "SELECT id, nama FROM user WHERE bidang_id='$bidang'";
 $pegawaiResult = mysqli_query($conn, $pegawaiQuery);
-
-// Fungsi ambil tugas berdasarkan pegawai
-function getTasksByPegawai($conn, $pegawai) {
-    $tasks = [];
-    $query = "SELECT * FROM task WHERE assigned_to='$pegawai'";
-    $result = mysqli_query($conn, $query);
-    while ($row = mysqli_fetch_assoc($result)) {
-        $tasks[] = $row;
-    }
-    return $tasks;
-}
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lihat Pegawai - Bidang <?php echo htmlspecialchars($bidang); ?></title>
+<title>Lihat Pegawai</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="p-4 bg-light">
 
 <div class="container">
-    <h1 class="mb-4">Pegawai Bidang: <?php echo htmlspecialchars($bidang); ?></h1>
+    <h1 class="mb-4">Pegawai Bidang: <?= htmlspecialchars($bidangNama) ?></h1>
     <div class="row">
         <?php if (mysqli_num_rows($pegawaiResult) > 0): ?>
             <?php while ($pegawai = mysqli_fetch_assoc($pegawaiResult)): ?>
@@ -44,49 +38,14 @@ function getTasksByPegawai($conn, $pegawai) {
                     <div class="card shadow text-center">
                         <div class="card-body">
                             <h5 class="card-title"><?= htmlspecialchars($pegawai['nama']) ?></h5>
-                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal<?= md5($pegawai['nama']) ?>">Lihat Tugas</button>
-                        </div>
-                    </div>
-                </div>
+                            <button class="btn btn-primary btn-sm lihat-tugas" 
+                                    data-id="<?= $pegawai['id'] ?>" 
+                                    data-nama="<?= htmlspecialchars($pegawai['nama']) ?>" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#taskModal">
+                                Lihat Tugas
+                            </button>
 
-                <!-- Modal untuk pegawai -->
-                <div class="modal fade" id="modal<?= md5($pegawai['nama']) ?>" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Tugas: <?= htmlspecialchars($pegawai['nama']) ?></h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <?php
-                                $tasks = getTasksByPegawai($conn, $pegawai['nama']);
-                                if (empty($tasks)) {
-                                    echo "<p class='text-muted'>Belum ada tugas.</p>";
-                                } else {
-                                    echo "<ul class='list-group'>";
-                                    foreach ($tasks as $task) {
-                                        $badgeClass = '';
-                                        if ($task['status'] == 'Dikerjakan') $badgeClass = 'bg-warning';
-                                        if ($task['status'] == 'Selesai') $badgeClass = 'bg-success';
-                                        if ($task['status'] == 'Terlambat') $badgeClass = 'bg-danger';
-
-                                        echo "
-                                        <li class='list-group-item'>
-                                            <div class='d-flex justify-content-between align-items-center'>
-                                                <strong>{$task['judul']}</strong>
-                                                <span class='badge $badgeClass'>{$task['status']}</span>
-                                            </div>
-                                            <p class='mb-0 text-muted'>{$task['deskripsi']}</p>
-                                            <small>Deadline: {$task['deadline']}</small>
-                                        </li>";
-                                    }
-                                    echo "</ul>";
-                                }
-                                ?>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -98,6 +57,43 @@ function getTasksByPegawai($conn, $pegawai) {
     <a href="dashboard.php" class="btn btn-secondary mt-3">Kembali</a>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Tugas Pegawai</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="taskContent">
+                <p class="text-center text-muted">Memuat data...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Event ketika tombol Lihat Tugas diklik
+document.querySelectorAll('.lihat-tugas').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const pegawaiId = this.getAttribute('data-id'); // ambil ID
+        const nama = this.getAttribute('data-nama'); // ambil nama untuk judul modal
+        
+        document.querySelector('.modal-title').innerText = "Tugas: " + nama;
+        document.getElementById('taskContent').innerHTML = "<p class='text-center text-muted'>Memuat data...</p>";
+        
+        fetch('get_tasks.php?id=' + encodeURIComponent(pegawaiId))
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('taskContent').innerHTML = data;
+            })
+            .catch(error => {
+                document.getElementById('taskContent').innerHTML = "<p class='text-danger'>Gagal memuat data.</p>";
+            });
+    });
+});
+
+</script>
 </body>
 </html>

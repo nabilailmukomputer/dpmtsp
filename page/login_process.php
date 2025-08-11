@@ -18,6 +18,7 @@ if ($data) {
     $_SESSION['role']      = $data['role'];      // Role
     $_SESSION['bidang']    = $data['bidang'];    // Nama bidang
     $_SESSION['bidang_id'] = $data['bidang_id']; // Jika ada kolom ini di DB
+    
    
 
     // Mapping role
@@ -25,8 +26,8 @@ if ($data) {
         'admin'              => 'admin/dashboard.php',
         'penanggung jawab'   => 'penanggungjawab/dashboard.php',
         'pengendali teknis'  => 'pengendaliteknis/dashboard.php', // Ganti folder tanpa spasi
-        'ketua divisi'       => 'ketua_divisi/dashboard.php',
-        'pegawai'            => 'pegawai/dashboard.php',
+        'ketua divisi'       => 'ketuadivisi/dashboard.php',
+        'anggota'            => 'pegawai/permohonan_tenggat.php',
     ];
 
     $role = strtolower(trim($data['role']));

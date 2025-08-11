@@ -1,0 +1,221 @@
+<?php
+session_start();
+include '../../db.php'; // sesuaikan path koneksi
+
+// Ambil ID user & bidang (misalnya dari session login)
+$id_user = $_SESSION['user_id'];
+$id_bidang = $_SESSION['bidang_id'];
+
+// Ambil info bidang
+$q_bidang = mysqli_query($conn, "SELECT * FROM bidang WHERE id = '$id_bidang'");
+$bidang = mysqli_fetch_assoc($q_bidang);
+$nama_bidang = $bidang['nama'];
+
+
+// Ambil semua pengumuman + user pembuat
+$q_pengumuman = mysqli_query($conn, "
+    SELECT p.*, u.nama AS nama_user
+    FROM pengumuman p
+    JOIN user u ON p.id_user = u.id
+    WHERE p.id_bidang = '$id_bidang'
+    ORDER BY p.tanggal DESC
+");
+
+$posts = [];
+while ($row = mysqli_fetch_assoc($q_pengumuman)) {
+    // Ambil komentar untuk setiap pengumuman
+    $id_pengumuman = $row['id'];
+    $q_komen = mysqli_query($conn, "
+        SELECT k.*, u.nama AS nama_user
+        FROM komentar_pengumuman k
+        JOIN user u ON k.id_user = u.id
+        WHERE k.id_pengumuman = '$id_pengumuman'
+        ORDER BY k.tanggal ASC
+    ");
+    $row['komentar'] = mysqli_fetch_all($q_komen, MYSQLI_ASSOC);
+    $posts[] = $row;
+}
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Ketua Divisi - <?= htmlspecialchars($nama_bidang ?? 'Bidang') ?></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    /* overlay untuk teks header agar kontras di banner */
+    .banner-overlay {
+      background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.45) 100%);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Header/banner -->
+    <div class="relative rounded-xl overflow-hidden shadow">
+      <img src="<?= htmlspecialchars($banner ?? '../../assets/dpmptsp.png') ?>" alt="Banner" class="w-full h-44 md:h-56 object-cover">
+      <div class="absolute inset-0 banner-overlay"></div>
+      <div class="absolute inset-0 flex items-center">
+        <div class="px-6 md:px-12">
+          <h1 class="text-white text-2xl md:text-4xl font-extrabold leading-tight drop-shadow"><?= htmlspecialchars($nama_bidang ?? 'Nama Bidang') ?></h1>
+          <p class="text-white/90 mt-1 md:mt-2 text-sm md:text-base"><?= htmlspecialchars($deskripsi_bidang ?? '') ?></p>
+        </div>
+      </div>
+      <div class="absolute right-4 bottom-4">
+        <!-- optional icon -->
+        <button class="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full hover:bg-white/30">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6l4 2" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs & left column layout -->
+    <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left column: summary / upcoming / people (small card) -->
+      <aside class="space-y-4">
+        <div class="bg-white p-4 rounded-lg shadow-sm">
+          <h3 class="text-sm font-semibold text-gray-700">Upcoming</h3>
+          <p class="mt-3 text-sm text-gray-500">Woohoo, no work due soon!</p>
+          <a href="tugas.php" class="text-sm text-blue-600 mt-3 inline-block">View all</a>
+        </div>
+      </aside>
+
+      <!-- Main column: stream/posts -->
+      <main class="lg:col-span-2">
+        <!-- Tabs (Stream / Classwork / People) -->
+        <nav class="bg-white rounded-lg shadow-sm px-4 py-3 flex items-center gap-4">
+          <a href="dashboard.php" class="text-sm font-medium text-blue-600 border-b-2 border-blue-600 pb-1">Stream</a>
+          <a href="tugas.php" class="text-sm text-gray-600 hover:text-gray-800">Tugas</a>
+          <a href="bidang.php" class="text-sm text-gray-600 hover:text-gray-800">Anggota</a>
+          <a href="tenggat.php" class="text-sm text-gray-600 hover:text-gray-800">Permohonan Tenggat Waktu</a>
+          <div class="ml-auto text-sm text-gray-500">You are viewing as: <span class="ml-2 font-medium text-gray-700"><?= htmlspecialchars($_SESSION['nama'] ?? 'Ketua') ?></span></div>
+        </nav>
+
+        <!-- Post composer -->
+<div class="bg-white mt-4 p-4 rounded-lg shadow-sm">
+  <!-- Placeholder awal -->
+  <div id="composer-placeholder" class="flex items-center gap-3 cursor-pointer">
+    <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-700">
+      <?= strtoupper(substr($_SESSION['nama'] ?? 'U',0,1)) ?>
+    </div>
+    <div class="flex-1 text-gray-500 border border-gray-300 rounded-full px-4 py-2 hover:bg-gray-50">
+      Umumkan sesuatu ke bidang...
+    </div>
+  </div>
+
+  <!-- Form asli, awalnya hidden -->
+  <form id="form-post" method="POST" action="buat_post.php" class="space-y-3 mt-3 hidden">
+    <input type="hidden" name="id_bidang" value="<?= (int)($id_bidang ?? 0) ?>">
+    <div class="flex items-start gap-3">
+      <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-700">
+        <?= strtoupper(substr($_SESSION['nama'] ?? 'U',0,1)) ?>
+      </div>
+      <textarea name="konten" id="konten" rows="3" placeholder="Tulis pengumuman kamu..." class="flex-1 resize-none p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"></textarea>
+    </div>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2 text-sm text-gray-500">
+        <button type="button" id="btn-attach" class="flex items-center gap-1 px-3 py-1 rounded text-gray-600 hover:bg-gray-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.172 7l-6.364 6.364a4 4 0 105.657 5.657L21 12.414" />
+          </svg>
+          Attachment
+        </button>
+      </div>
+      <div>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">Kirim</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+        <!-- Posts list -->
+        <div class="mt-4 space-y-4">
+          <?php if (!empty($posts)): ?>
+            <?php foreach($posts as $post): ?>
+              <article class="bg-white rounded-lg shadow-sm p-4">
+                <div class="flex items-start gap-3">
+                  <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold text-gray-700">
+                    <?= strtoupper(substr($post['nama_user'],0,1)) ?>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="text-sm font-semibold text-gray-800"><?= htmlspecialchars($post['nama_user']) ?></div>
+                        <div class="text-xs text-gray-500"><?= date("d M Y H:i", strtotime($post['tanggal'])) ?></div>
+                      </div>
+                      <div class="text-sm text-gray-400">...</div>
+                    </div>
+
+                    <div class="mt-3 text-gray-800 text-sm"><?= nl2br(htmlspecialchars($post['konten'])) ?></div>
+
+                    <!-- Comments -->
+                    <div class="mt-4 border-t pt-3">
+                      <?php if (!empty($post['komentar'])): ?>
+                        <?php foreach($post['komentar'] as $komen): ?>
+                          <div class="flex items-start gap-3 py-2">
+                            <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-700"><?= strtoupper(substr($komen['nama_user'],0,1)) ?></div>
+                            <div class="flex-1">
+                              <div class="text-sm"><span class="font-medium"><?= htmlspecialchars($komen['nama_user']) ?></span> <span class="text-gray-500 text-xs">· <?= date("d M Y H:i", strtotime($komen['tanggal'])) ?></span></div>
+                              <div class="text-sm text-gray-700 mt-1"><?= htmlspecialchars($komen['konten']) ?></div>
+                            </div>
+                          </div>
+                        <?php endforeach; ?>
+                      <?php endif; ?>
+
+                      <!-- comment form -->
+                      <form method="POST" action="buat_komentar.php" class="flex items-center gap-3 mt-2">
+                        <input type="hidden" name="id_pengumuman" value="<?= (int)$post['id'] ?>">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-700"><?= strtoupper(substr($_SESSION['nama'] ?? 'U',0,1)) ?></div>
+                        <input name="konten" placeholder="Tambahkan komentar..." class="flex-1 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                        <button type="submit" class="text-blue-600 text-sm font-medium">Kirim</button>
+                      </form>
+                    </div>
+
+                  </div>
+                </div>
+              </article>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="bg-white p-6 rounded-lg shadow-sm text-center text-gray-500">Belum ada pengumuman. Buat pengumuman pertama!</div>
+          <?php endif; ?>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Opsional: kirim AJAX untuk Post/Comment (supaya tidak reload) -->
+  <script>
+    // contoh AJAX post sederhana (optional)
+    document.getElementById('form-post')?.addEventListener('submit', function(e){
+      // jika ingin kirim ajax, cegah submit default dan kirim fetch ke buat_post.php
+      //Otherwise remove this block to use normal form submit.
+      e.preventDefault();
+      const fd = new FormData(this);
+      fetch('buat_post.php', {
+        method: 'POST',
+        body: fd
+      }).then(r => r.text()).then(res => {
+        // setelah sukses reload atau append hasil
+        location.reload();
+      }).catch(err => console.error(err));
+    });
+    
+  const placeholder = document.getElementById('composer-placeholder');
+  const formPost = document.getElementById('form-post');
+
+  if (placeholder && formPost) {
+    placeholder.addEventListener('click', () => {
+      placeholder.classList.add('hidden');
+      formPost.classList.remove('hidden');
+    });
+  }
+
+  </script>
+</body>
+</html>

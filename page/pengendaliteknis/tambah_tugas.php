@@ -2,27 +2,21 @@
 session_start();
 include '../../db.php';
 
-// Pastikan user sudah login
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
     exit;
 }
 
-// Ambil bidang user dari session
-$bidang = $_SESSION['bidang_id'];
-$user_id = $_SESSION['user_id'];
-
-// Ambil pegawai sesuai bidang
-$queryPegawai = "
-    SELECT u.id, u.nama, b.nama AS bidang_nama
-    FROM user u
-    JOIN bidang b ON u.bidang_id = b.id
-    WHERE u.role = 'Anggota' AND u.bidang_id = '$bidang'
+// Ambil semua user + bidang
+$sql = "
+SELECT user.id, user.nama, bidang.nama AS nama_bidang
+FROM user
+JOIN bidang ON user.bidang_id = bidang.id
+ORDER BY bidang.nama, user.nama
 ";
+$result_users = $conn->query($sql);
 
-$pegawai = mysqli_query($conn, $queryPegawai);
-
-// Daftar role
+// List Role
 $roles = [
     'admin' => 'Admin',
     'penanggung jawab' => 'Penanggung Jawab',
@@ -31,30 +25,43 @@ $roles = [
     'anggota' => 'Anggota'
 ];
 
+// Ambil bidang dari URL hanya untuk judul (tidak untuk input database)
+$bidang_url = isset($_GET['bidang']) ? mysqli_real_escape_string($conn, $_GET['bidang']) : '';
+
 // Proses simpan data
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $judul = mysqli_real_escape_string($conn, $_POST['judul']);
     $deskripsi = mysqli_real_escape_string($conn, $_POST['deskripsi']);
-    $tanggal_tugas = $_POST['tanggal_tugas'];
     $deadline_date = $_POST['deadline_date'];
     $deadline_time = $_POST['deadline_time'];
+    $deadline = $deadline_date . ' ' . $deadline_time . ':00';
     $assigned_to = $_POST['assigned_to'];
-    $created_by = $_SESSION['nama']; // Ambil nama user yang login
     $role_user = $_POST['role_user'];
     $status = $_POST['status'];
+    $created_by = isset($_SESSION['nama']) ? $_SESSION['nama'] : 'Admin';
 
-    // Gabungkan tanggal dan waktu deadline
-    $deadline = $deadline_date . ' ' . $deadline_time;
+    // ✅ Ambil nama bidang dari assigned_to
+    $sqlBidang = "
+        SELECT b.nama AS nama_bidang
+        FROM user u
+        JOIN bidang b ON u.bidang_id = b.id
+        WHERE u.id = '$assigned_to'
+    ";
+    $resBidang = mysqli_query($conn, $sqlBidang);
+    $dataBidang = mysqli_fetch_assoc($resBidang);
+    $bidang_user = $dataBidang ? $dataBidang['nama_bidang'] : '';
 
-    // Simpan ke database
-    $queryInsert = "INSERT INTO task (judul, deskripsi, tanggal_tugas, deadline, assigned_to, created_by, role_user, status, bidang_user) 
-                    VALUES ('$judul', '$deskripsi', '$tanggal_tugas', '$deadline', '$assigned_to', '$created_by', '$role_user', '$status', '$bidang')";
-    
-    if (mysqli_query($conn, $queryInsert)) {
-        header("Location: $bidang.php?success=1");
+    $stmt = $conn->prepare("
+        INSERT INTO task (judul, deskripsi,  deadline, created_by, assigned_to, bidang_user, role_user, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->bind_param("ssssssss", $judul, $deskripsi, $deadline, $created_by, $assigned_to, $bidang_user, $role_user, $status);
+
+    if ($stmt->execute()) {
+        header("Location: dashboard.php?success=1&bidang=" . urlencode($bidang_user));
         exit;
     } else {
-        echo "Error: " . mysqli_error($conn);
+        echo "<div class='alert alert-danger'>Error: " . htmlspecialchars($stmt->error) . "</div>";
     }
 }
 ?>
@@ -68,10 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="p-4 bg-light">
 <div class="container">
-    <h1 class="mb-4">Tambah Tugas - Bidang: <?php echo htmlspecialchars($bidang); ?></h1>
+    <h1 class="mb-4">Tambah Tugas<?= $bidang_url ? ' - Bidang: ' . htmlspecialchars($bidang_url) : '' ?></h1>
+    <form method="POST" action="?bidang=<?= urlencode($bidang_url); ?>" class="p-4 border rounded bg-white shadow">
 
-    <form method="POST" class="p-4 border rounded bg-white shadow">
-        <!-- Judul Tugas -->
+        <!-- Judul -->
         <div class="mb-3">
             <label class="form-label">Judul Tugas</label>
             <input type="text" name="judul" class="form-control" required>
@@ -83,12 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <textarea name="deskripsi" class="form-control" required></textarea>
         </div>
 
-        <!-- Tanggal Tugas -->
-        <div class="mb-3">
-            <label class="form-label">Tanggal Tugas</label>
-            <input type="date" name="tanggal_tugas" class="form-control" required>
-        </div>
-
+        
         <!-- Deadline -->
         <div class="mb-3">
             <label class="form-label">Deadline</label>
@@ -103,8 +105,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label class="form-label">Ditugaskan Kepada</label>
             <select name="assigned_to" class="form-control" required>
                 <option value="">-- Pilih Pegawai --</option>
-                <?php while($row = mysqli_fetch_assoc($pegawai)): ?>
-                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['nama']) ?></option>
+                <?php while ($user = $result_users->fetch_assoc()): ?>
+                    <option value="<?= htmlspecialchars($user['id']); ?>">
+                        <?= htmlspecialchars($user['nama']); ?> (<?= htmlspecialchars($user['nama_bidang']); ?>)
+                    </option>
                 <?php endwhile; ?>
             </select>
         </div>
@@ -124,15 +128,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="mb-3">
             <label class="form-label">Status</label>
             <select name="status" class="form-control" required>
-                <option value="dikerjakan">Dikerjakan</option>
-                <option value="selesai">Selesai</option>
-                <option value="terlambat">Terlambat</option>
+                <option value="Dikerjakan">Dikerjakan</option>
+                <option value="Selesai">Selesai</option>
+                <option value="Terlambat">Terlambat</option>
             </select>
         </div>
 
-        <!-- Tombol -->
         <button type="submit" class="btn btn-success">Simpan Tugas</button>
-        <a href="<?= $bidang ?>.php" class="btn btn-secondary">Kembali</a>
+        <a href="dashboard.php" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
 </body>
