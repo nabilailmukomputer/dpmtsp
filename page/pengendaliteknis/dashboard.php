@@ -1,8 +1,6 @@
 <?php
 include '../../db.php';
 session_start();
-
-// Pastikan user login
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['bidang_id'])) {
     header('Location: ../login.php');
     exit;
@@ -10,14 +8,11 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['bidang_id'])) {
 
 $user_nama = $_SESSION['nama'];
 $bidang_id = $_SESSION['bidang_id'];
-
-// Ambil nama bidang
 $resultBidang = mysqli_query($conn, "SELECT nama FROM bidang WHERE id='$bidang_id'");
 $bidang_nama = ($resultBidang && mysqli_num_rows($resultBidang) > 0) 
     ? mysqli_fetch_assoc($resultBidang)['nama'] 
     : 'Tidak Diketahui';
 
-// Ambil 5 tugas terbaru
 $tugas_query = mysqli_query($conn, "SELECT judul, deadline, status 
     FROM task 
     WHERE bidang_user='$bidang_nama' 
