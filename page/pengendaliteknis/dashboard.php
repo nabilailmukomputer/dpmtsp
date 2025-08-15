@@ -39,7 +39,7 @@ $tugas_query = mysqli_query($conn, "SELECT judul, deadline, status
             <ul class="space-y-3">
                 <li><a href="tambah_tugas.php" class="block hover:bg-gray-700 px-3 py-2 rounded">➕ Tambah Tugas</a></li>
                 <li><a href="lihat_pegawai.php" class="block hover:bg-gray-700 px-3 py-2 rounded">👥 Lihat Pegawai</a></li>
-                <li><a href="permohonan_tenggat.php" class="block hover:bg-gray-700 px-3 py-2 rounded">📩 Permohonan Tenggat</a></li>
+                <!--<li><a href="permohonan_tenggat.php" class="block hover:bg-gray-700 px-3 py-2 rounded">📩 Permohonan Tenggat</a></li>-->
                 <li><a href="../logout.php" class="block hover:bg-red-500 px-3 py-2 rounded">🚪 Logout</a></li>
             </ul>
         </nav>
@@ -61,11 +61,11 @@ $tugas_query = mysqli_query($conn, "SELECT judul, deadline, status
         <div class="flex gap-4 mb-6">
             <a href="tambah_tugas.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Tambah Tugas</a>
             <a href="lihat_pegawai.php" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">Lihat Pegawai</a>
-            <a href="permohonan_tenggat.php" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg">Permohonan Tenggat</a>
+            <!--<a href="permohonan_tenggat.php" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg">Permohonan Tenggat</a>-->
         </div>
 
         <!-- Tabel Tugas Terbaru -->
-        <div class="bg-white shadow rounded-lg p-4">
+       <!-- <div class="bg-white shadow rounded-lg p-4">
             <h2 class="text-xl font-bold mb-4">📌 Tugas Terbaru</h2>
             <table class="w-full border border-gray-300">
                 <thead class="bg-gray-200">
@@ -89,7 +89,7 @@ $tugas_query = mysqli_query($conn, "SELECT judul, deadline, status
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr><td colspan="3" class="text-center py-4 text-gray-500">Belum ada tugas</td></tr>
-                    <?php endif; ?>
+                    <?php endif; ?>-->
                 </tbody>
             </table>
         </div>

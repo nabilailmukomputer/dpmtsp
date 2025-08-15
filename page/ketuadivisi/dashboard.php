@@ -14,6 +14,21 @@ $q_bidang = mysqli_query($conn, "SELECT * FROM bidang WHERE id = '$bidang_id'");
 $bidang = mysqli_fetch_assoc($q_bidang);
 $nama_bidang = $bidang['nama'];
 
+// Proses kirim pengumuman
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id_user = $_SESSION['user_id'];
+    $teks = mysqli_real_escape_string($conn, $_POST['teks']);
+
+    $query = "INSERT INTO pengumuman (id_user, teks, created_at) 
+              VALUES ('$id_user', '$teks', NOW())";
+
+    if (mysqli_query($conn, $query)) {
+        header("Location: dashboard.php");
+        exit;
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+}
 
 // Ambil semua pengumuman + user pembuat
 $q_pengumuman = mysqli_query($conn, "
@@ -26,18 +41,18 @@ $q_pengumuman = mysqli_query($conn, "
 
 $posts = [];
 while ($row = mysqli_fetch_assoc($q_pengumuman)) {
-    // Ambil komentar untuk setiap pengumuman
-    $id_pengumuman = $row['id'];
+    $id_pengumuman = $row['id']; // ini ID dari tabel pengumuman
     $q_komen = mysqli_query($conn, "
         SELECT k.*, u.nama AS nama_user
         FROM komentar_pengumuman k
-        JOIN user u ON k.id_user = u.id
-        WHERE k.id_pengumuman = '$id_pengumuman'
-        ORDER BY k.tanggal ASC
+        JOIN user u ON k.user_id = u.id
+        WHERE k.tugas_id = '$id_pengumuman'
+        ORDER BY k.created_at ASC
     ");
     $row['komentar'] = mysqli_fetch_all($q_komen, MYSQLI_ASSOC);
     $posts[] = $row;
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -158,34 +173,37 @@ while ($row = mysqli_fetch_assoc($q_pengumuman)) {
                     </button>
                   </div>
                   <!-- Toolbar bawah -->
-                  <!-- Toolbar bawah -->
-<div class="flex items-center justify-between mt-2">
-  <div class="flex gap-2">
-    <!-- Upload File -->
-    <button type="button" id="btn-upload" class="p-2 rounded-full hover:bg-gray-100" title="Upload File">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-              d="M4 16v4h16v-4m-4-4l-4-4-4 4m4-4v12" />
-      </svg>
-    </button>
+                   <div class="flex items-center justify-between mt-2">
+                    <div class="flex gap-2">
+                      <!-- Upload File -->
+                       <button type="button" id="btn-upload" class="p-2 rounded-full hover:bg-gray-100" title="Upload File">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M4 16v4h16v-4m-4-4l-4-4-4 4m4-4v12" />
+                        </svg>
+                      </button>
+                      <!-- Add Link -->
+                       <button type="button" id="btn-link" class="p-2 rounded-full hover:bg-gray-100" title="Add Link">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M13.828 10.172a4 4 0 015.656 5.656
+                          m-1.415-4.242l-4.243 4.243
+                          a4 4 0 01-5.656-5.656l1.414-1.414" />
+                        </svg>
+                      </button>
+                    </div>
+                    <!-- Hidden file input -->
+                     <input type="file" id="file-input" name="file_upload" class="hidden">
+                     <input type="text" name="teks" class="hidden">
+                     <textarea name="teks" id="teks" hidden></textarea>
 
-    <!-- Add Link -->
-    <button type="button" id="btn-link" class="p-2 rounded-full hover:bg-gray-100" title="Add Link">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-              d="M13.828 10.172a4 4 0 015.656 5.656
-                 m-1.415-4.242l-4.243 4.243
-                 a4 4 0 01-5.656-5.656l1.414-1.414" />
-      </svg>
-    </button>
-  </div>
-
-  <!-- Hidden file input -->
-  <input type="file" id="file-input" name="file_upload" class="hidden">
-
-  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">Kirim</button>
+<!-- Editor -->
+<div id="editor" contenteditable="true" class="border p-2 rounded min-h-[100px]">
 </div>
 
+                     <div id="editor" contenteditable="true" class="border p-2 rounded">
+                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">Kirim</button>
+                    </div>
                 </div>
               </form>
             </div>
@@ -202,11 +220,22 @@ while ($row = mysqli_fetch_assoc($q_pengumuman)) {
                         <div class="flex items-center justify-between">
                           <div>
                             <div class="text-sm font-semibold text-gray-800"><?= htmlspecialchars($post['nama_user']) ?></div>
-                            <div class="text-xs text-gray-500"><?= date("d M Y H:i", strtotime($post['tanggal'])) ?></div>
+                            <div class="text-xs text-gray-500"><?= date("d M Y H:i", strtotime($post['created_at'])) ?></div>
+                            <div class="text-sm font-semibold text-gray-800"><?= htmlspecialchars($post['teks']) ?></div>
+                            
                           </div>
-                          <div class="text-sm text-gray-400">...</div>
-                        </div>
-                        <div class="mt-3 text-gray-800 text-sm"><?= nl2br(htmlspecialchars($post['konten'])) ?></div>
+                          <div class="relative">
+                            <!-- Tombol titik tiga -->
+                             <button type="button" onclick="toggleMenu(this)" class="text-gray-400 hover:text-gray-600 focus:outline-none">...</button>
+                            <!-- Menu dropdown -->
+                            <div class="hidden absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                                <button onclick="copyLink('dashboard.php?id=<?= $post['id'] ?>')" 
+                                    class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Copy Link</button>
+
+                                <!-- Tombol delete -->
+                                <button onclick="deletePengumuman(<?= $post['id'] ?>)" 
+                                    class="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-100">Delete</button>
+                </div>
                         <!-- Comments -->
                          <div class="mt-4 border-t pt-3">
                           <?php if (!empty($post['komentar'])): ?>
@@ -221,7 +250,7 @@ while ($row = mysqli_fetch_assoc($q_pengumuman)) {
                               <?php endforeach; ?>
                               <?php endif; ?>
                               <!-- comment form -->
-                               <form method="POST" action="buat_komentar.php" class="flex items-center gap-3 mt-2">
+                               <form method="POST" action="dashboard.php" class="flex items-center gap-3 mt-2">
                                 <input type="hidden" name="id_pengumuman" value="<?= (int)$post['id'] ?>">
                                 <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-700"><?= strtoupper(substr($_SESSION['nama'] ?? 'U',0,1)) ?></div>
                                 <input name="konten" placeholder="Tambahkan komentar..." class="flex-1 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
@@ -242,8 +271,10 @@ while ($row = mysqli_fetch_assoc($q_pengumuman)) {
 
                 <!-- Opsional: kirim AJAX untuk Post/Comment (supaya tidak reload) -->
               <script>
+                
                  // contoh AJAX post sederhana (optional)
                  document.getElementById('form-post')?.addEventListener('submit', function(e){
+                  document.getElementById('teks').value = document.getElementById('editor').innerHTML;
                  // jika ingin kirim ajax, cegah submit default dan kirim fetch ke buat_post.php
                  //Otherwise remove this block to use normal form submit.
                  e.preventDefault();
@@ -294,6 +325,36 @@ while ($row = mysqli_fetch_assoc($q_pengumuman)) {
                   document.execCommand("createLink", false, url);
                 }
               });
+              function deletePengumuman(id) {
+    if (confirm("Yakin ingin menghapus pengumuman ini?")) {
+        window.location.href = "hapus_pengumuman.php?id=" + id;
+    }
+}
+              function toggleMenu(el) {
+              // Tutup semua menu lain
+              document.querySelectorAll('.relative .absolute').forEach(menu => menu.classList.add('hidden'));
+              // Toggle menu ini
+              el.nextElementSibling.classList.toggle('hidden');
+              }
+              
+              function copyLink(link) {
+              navigator.clipboard.writeText(window.location.origin + '/' + link);
+              alert("Link copied!");
+              }
+              function reportAbuse(id) {
+              alert("Report Abuse for Post ID: " + id);
+              }
+              
+              // Tutup menu kalau klik di luar
+              document.addEventListener('click', function(e) {
+              if (!e.target.closest('.relative')) {
+              document.querySelectorAll('.relative .absolute').forEach(menu => menu.classList.add('hidden'));
+              }
+              
+
+                            });
+
+</script>
 
               </script>
   </body>

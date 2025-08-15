@@ -236,11 +236,16 @@ if (!isset($_SESSION['user_id'])) {
   <div>
     <h2>SIMANTAP</h2>
     <ul>
-      <li><a href="kesekretariatan.php"><i class="fa-solid fa-folder"></i> <span class="menu-text">Kesekretariatan</span></a></li>
-      <li><a href="pelayanan.php"><i class="fa-solid fa-gear"></i> <span class="menu-text">Pelayanan</span></a></li>
-      <li><a href="penanaman modal.php"><i class="fa-solid fa-building"></i> <span class="menu-text">Penanaman Modal</span></a></li>
-      <li><a href="tambah.php"><i class="fa-solid fa-building"></i> <span class="menu-text">Tambah Tugas</span></a></li>
-      <li><a href="permohonan_tenggat.php"><i class="fa-solid fa-building"></i> <span class="menu-text">Permohonan Tenggat</span></a></li>
+      <li><a href="kesekretariatan.php"><i class="fa-solid fa-folder-open"></i> <span class="menu-text">Kesekretariatan</span></a></li>
+
+<li><a href="pelayanan.php"><i class="fa-solid fa-handshake"></i> <span class="menu-text">Pelayanan</span></a></li>
+
+<li><a href="penanaman modal.php"><i class="fa-solid fa-chart-line"></i> <span class="menu-text">Penanaman Modal</span></a></li>
+
+<li><a href="tambah.php"><i class="fa-solid fa-plus-circle"></i> <span class="menu-text">Tambah Tugas</span></a></li>
+
+<li><a href="permohonan_tenggat.php"><i class="fa-solid fa-clock"></i> <span class="menu-text">Permohonan Tenggat</span></a></li>
+
     </ul>
   </div>
   <div class="logout-btn">

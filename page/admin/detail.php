@@ -8,10 +8,31 @@ if (!isset($_SESSION['nama'])) {
 }
 date_default_timezone_set('Asia/Jakarta');
 
+// ✅ Tambah handler untuk update waktu & status langsung dari fetch()
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['status'])) {
+    $id = intval($_POST['id']);
+    $status = mysqli_real_escape_string($conn, $_POST['status']);
+
+    $sisa_waktu = isset($_POST['sisa_waktu']) ? intval($_POST['sisa_waktu']) : null;
+    $waktu_terlambat = isset($_POST['waktu_terlambat']) ? intval($_POST['waktu_terlambat']) : null;
+
+    if ($sisa_waktu !== null) {
+        $sql = "UPDATE task SET status='$status', sisa_waktu=$sisa_waktu, waktu_terlambat=NULL WHERE id=$id";
+    } elseif ($waktu_terlambat !== null) {
+        $sql = "UPDATE task SET status='$status', waktu_terlambat=$waktu_terlambat, sisa_waktu=NULL WHERE id=$id";
+    } else {
+        $sql = "UPDATE task SET status='$status' WHERE id=$id";
+    }
+    mysqli_query($conn, $sql);
+    echo "OK";
+    exit;
+}
+
+// =================== TAMPILAN LIST ===================
 $search = isset($_GET['q']) ? mysqli_real_escape_string($conn, $_GET['q']) : '';
 
 $query = "
-SELECT t.id, t.judul, t.deadline, t.tanggal_tugas, t.status, t.sisa_waktu,
+SELECT t.id, t.judul, t.deadline, t.tanggal_tugas, t.status, t.sisa_waktu, t.waktu_terlambat,
        u.nama AS penerima
 FROM task t
 JOIN user u ON t.assigned_to = u.id
@@ -38,11 +59,10 @@ $result = mysqli_query($conn, $query);
 <body class="bg-gray-100">
 
 <div class="flex h-screen">
+    <!-- Sidebar -->
     <aside id="sidebar" class="w-64 bg-[#0D2B53] text-white flex flex-col min-h-screen transition-all duration-300">
       <div class="flex items-center justify-between px-6 py-6 text-xl font-bold">
-        <div class="flex items-center space-x-2">
-          <span class="menu-text">SIMANTAP</span>
-        </div>
+        <span class="menu-text">SIMANTAP</span>
         <button id="toggle-btn" class="text-white focus:outline-none">
           <span class="material-icons">menu</span>
         </button>
@@ -75,6 +95,7 @@ $result = mysqli_query($conn, $query);
       </div>
     </aside>
 
+    <!-- Main Content -->
     <main class="flex-1 p-6">
         <h1 class="text-2xl font-bold mb-4">Detail Tugas Pegawai</h1>
         <div class="mb-4">
@@ -96,35 +117,46 @@ $result = mysqli_query($conn, $query);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while($row = mysqli_fetch_assoc($result)):
-                        $deadline = strtotime($row['deadline']);
-                        $assigned = strtotime($row['tanggal_tugas']);
-                        $total = max(1, $deadline - $assigned);
+                   <?php
+// ...
+while($row = mysqli_fetch_assoc($result)):
+    $deadline = strtotime($row['deadline']);
+    $assigned = strtotime($row['tanggal_tugas']);
+    $total = max(1, $deadline - $assigned);
 
-                       if ($row['status'] === 'selesai' && !is_null($row['sisa_waktu'])) {
-    $remaining = $row['sisa_waktu']; // ambil dari database
+    // Bagian PHP perhitungan waktu
+if ($row['status'] === 'selesai') {
+    if ($row['sisa_waktu'] !== null && $row['sisa_waktu'] !== '') {
+        $remaining = (int)$row['sisa_waktu']; // waktu saat selesai
+    } elseif ($row['waktu_terlambat'] !== null && $row['waktu_terlambat'] !== '') {
+        $remaining = -(int)$row['waktu_terlambat']; // telat → minus
+    } else {
+        $remaining = 0;
+    }
 } else {
-    $remaining = $deadline - time(); // hitung mundur jika belum selesai
+    $remaining = $deadline - time(); // tetap bisa minus
 }
 
-                    ?>
-                    <tr class="text-center">
-                        <td class="border px-4 py-2"><?= htmlspecialchars($row['judul']) ?></td>
-                        <td class="border px-4 py-2"><?= htmlspecialchars($row['penerima']) ?></td>
-                        <td class="border px-4 py-2"><?= htmlspecialchars($row['tanggal_tugas']) ?></td>
-                        <td class="border px-4 py-2"><?= htmlspecialchars($row['deadline']) ?></td>
-                        <td class="border px-4 py-2">
-                            <span id="timer-<?= $row['id']; ?>"
-                                  class="timer-box bg-green-600 text-white px-3 py-1 rounded"
-                                  data-remaining="<?= $remaining; ?>"
-                                  data-total="<?= $total; ?>"
-                                  data-id="<?= $row['id']; ?>">
-                                  <?= ($remaining < 0 ? '-' : '') . gmdate("H:i:s", abs($remaining)); ?>
-                            </span>
-                        </td>
-                        <td id="status-<?= $row['id']; ?>" class="border px-4 py-2"><?= htmlspecialchars($row['status']) ?></td>
-                    </tr>
-                    <?php endwhile; ?>
+?>
+<tr class="text-center">
+    <td class="border px-4 py-2"><?= htmlspecialchars($row['judul']) ?></td>
+    <td class="border px-4 py-2"><?= htmlspecialchars($row['penerima']) ?></td>
+    <td class="border px-4 py-2"><?= htmlspecialchars($row['tanggal_tugas']) ?></td>
+    <td class="border px-4 py-2"><?= htmlspecialchars($row['deadline']) ?></td>
+    <td class="border px-4 py-2">
+        <span id="timer-<?= $row['id']; ?>"
+              class="timer-box <?= ($remaining < 0 ? 'bg-gray-500' : 'bg-green-600') ?> text-white px-3 py-1 rounded"
+              data-remaining="<?= $remaining; ?>"
+              data-total="<?= $total; ?>"
+              data-id="<?= $row['id']; ?>"
+              data-status="<?= $row['status']; ?>">
+              <?= ($remaining < 0 ? '-' : '') . gmdate("H:i:s", abs($remaining)); ?>
+        </span>
+    </td>
+    <td id="status-<?= $row['id']; ?>" class="border px-4 py-2"><?= htmlspecialchars($row['status']) ?></td>
+</tr>
+<?php endwhile; ?>
+
                 </tbody>
             </table>
         </div>
@@ -141,42 +173,70 @@ function updateTimerDisplay(timer, remaining) {
   timer.textContent = `${isNegative ? "-" : ""}${hours}:${minutes}:${seconds}`;
 }
 
+function kirimWaktuKeDB(id, remaining) {
+  const data = new URLSearchParams();
+  data.append("id", id);
+  data.append("status", "selesai");
+
+  if (remaining >= 0) {
+    data.append("sisa_waktu", remaining);
+  } else {
+    data.append("waktu_terlambat", Math.abs(remaining));
+  }
+
+  // kirim POST ke file ini sendiri
+  fetch(window.location.href, {
+    method: "POST",
+    body: data
+  })
+    .then(res => res.text())
+    .then(res => {
+      console.log("Respon:", res);
+      if (res.trim() === "OK") {
+        // update tampilan tanpa reset ke 00
+        const timerEl = document.querySelector(`#timer-${id}`);
+        updateTimerDisplay(timerEl, remaining);
+        document.querySelector(`#status-${id}`).textContent = "selesai";
+      }
+    })
+    .catch(err => console.error("Error:", err));
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const timers = document.querySelectorAll("[id^='timer-']");
 
   timers.forEach(timer => {
     let remaining = parseInt(timer.dataset.remaining);
-    const taskId = timer.dataset.id;
-    const statusElement = document.getElementById("status-" + taskId);
+    const total = parseInt(timer.dataset.total);
+    const status = timer.dataset.status.toLowerCase();
+    const id = timer.dataset.id;
+
+    if (status === "selesai") {
+      updateTimerDisplay(timer, remaining);
+      return;
+    }
 
     const interval = setInterval(() => {
-      if (statusElement?.textContent?.trim()?.toLowerCase() === "selesai") {
-        fetch("update_status.php", {
-  method: "POST",
-  headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  body: `id=${taskId}&status=selesai&waktu_terlambat=${remaining < 0 ? remaining : 0}`
-});
-
-        clearInterval(interval);
-        return;
-      }
       remaining -= 1;
-updateTimerDisplay(timer, remaining);
+      updateTimerDisplay(timer, remaining);
 
-// Update warna background dinamis
-let colorClass = "bg-green-600";
-if (remaining < 0) {
-  colorClass = "bg-gray-500";
-} else if (remaining <= parseInt(timer.dataset.total) / 2) {
-  colorClass = "bg-red-500";
-}
-timer.className = `timer-box ${colorClass} text-white px-3 py-1 rounded`;
-
+      let colorClass = "bg-green-600";
+      if (remaining < 0) {
+        colorClass = "bg-gray-500";
+      } else if (remaining <= total / 2) {
+        colorClass = "bg-red-500";
+      }
+      timer.className = `timer-box ${colorClass} text-white px-3 py-1 rounded`;
     }, 1000);
+
+    // Klik untuk selesai
+    timer.addEventListener("click", function () {
+      clearInterval(interval);
+      kirimWaktuKeDB(id, remaining);
+    });
   });
 });
 
 </script>
-
 </body>
 </html>

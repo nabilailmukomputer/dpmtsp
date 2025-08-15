@@ -8,11 +8,16 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // Ambil data permohonan tenggat
-$query = "SELECT dr.*, u.nama AS requested_by, t.deadline AS deadline_awal, t.judul
-          FROM deadline_request dr
-          JOIN user u ON dr.user_id = u.id
-          JOIN task t ON dr.task_id = t.id
-          ORDER BY dr.id DESC";
+$query = "SELECT dr.*, 
+       u.nama AS requested_by, 
+       t.deadline AS deadline_awal, 
+       t.judul AS judul_tugas
+FROM deadline_request dr
+JOIN user u ON dr.user_id = u.id
+JOIN task t ON dr.task_id = t.id
+WHERE dr.status in ('dikerjakan', 'selesai', 'terlambat')
+ORDER BY dr.id DESC
+";
 
 $result = mysqli_query($conn, $query);
 ?>
@@ -39,7 +44,7 @@ $result = mysqli_query($conn, $query);
             <?php while ($row = mysqli_fetch_assoc($result)) { ?>
                 <tr class="hover:bg-gray-100">
                     <td class="py-2 px-4 border"><?= htmlspecialchars($row['requested_by']) ?></td>
-                    <td class="py-2 px-4 border"><?= htmlspecialchars($row['judul']) ?></td>
+                    <td class="py-2 px-4 border"><?= htmlspecialchars($row['judul_tugas']) ?></td>
                     <td class="py-2 px-4 border"><?= htmlspecialchars($row['deadline_awal']) ?></td>
                     <td class="py-2 px-4 border"><?= htmlspecialchars($row['requested_deadline']) ?></td>
                     <td class="py-2 px-4 border"><?= htmlspecialchars($row['alasan']) ?></td>

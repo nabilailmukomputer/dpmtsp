@@ -81,15 +81,16 @@ document.querySelectorAll('.lihat-tugas').forEach(btn => {
         const nama = this.getAttribute('data-nama'); // ambil nama untuk judul modal
         
         document.querySelector('.modal-title').innerText = "Tugas: " + nama;
-        document.getElementById('taskContent').innerHTML = "<p class='text-center text-muted'>Memuat data...</p>";
+        const taskContent = document.getElementById('taskContent');
+        taskContent.innerHTML = "<p class='text-center text-muted'>Memuat data...</p>";
         
         fetch('get_tasks.php?id=' + encodeURIComponent(pegawaiId))
             .then(response => response.text())
             .then(data => {
-                document.getElementById('taskContent').innerHTML = data;
+                taskContent.innerHTML = data; // langsung tampilkan isi dari get_tasks.php
             })
             .catch(error => {
-                document.getElementById('taskContent').innerHTML = "<p class='text-danger'>Gagal memuat data.</p>";
+                taskContent.innerHTML = "<p class='text-danger'>Gagal memuat data.</p>";
             });
     });
 });

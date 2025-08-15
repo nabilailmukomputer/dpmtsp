@@ -2,29 +2,39 @@
 include '../../db.php';
 session_start();
 
-$id_bidang = $_POST['id_bidang'];
-$konten = $_POST['konten'];
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['bidang_id'])) {
+    die("Akses ditolak");
+}
+
 $user_id = $_SESSION['user_id'];
+$bidang_id = $_SESSION['bidang_id'];
+$teks = $_POST['teks'] ?? '';
+$created_at = date('Y-m-d H:i:s');
 
-// 1. Simpan pengumuman
-mysqli_query($conn, "INSERT INTO pengumuman (bidang_id, user_id, konten, tanggal, created_at)
-                     VALUES ('$id_bidang', '$user_id', '$konten', NOW(), NOW())");
-$id_pengumuman = mysqli_insert_id($conn);
+// Upload file jika ada
+$lampiranNama = null;
+$jenisLampiran = null;
 
-// 2. Upload file (jika ada)
 if (!empty($_FILES['lampiran']['name'][0])) {
-    $total_files = count($_FILES['lampiran']['name']);
-    for ($i = 0; $i < $total_files; $i++) {
-        $nama_file = basename($_FILES['lampiran']['name'][$i]);
-        $target = "../../uploads/" . time() . "_" . $nama_file;
+    $file = $_FILES['lampiran'];
+    $namaFile = time() . "_" . basename($file['name'][0]);
+    $targetPath = "uploads" . $namaFile;
 
-        if (move_uploaded_file($_FILES['lampiran']['tmp_name'][$i], $target)) {
-            mysqli_query($conn, "INSERT INTO lampiran_pengumuman (id_pengumuman, nama_file, path_file)
-                                 VALUES ('$id_pengumuman', '$nama_file', '$target')");
-        }
+    if (move_uploaded_file($file['tmp_name'][0], $targetPath)) {
+        $lampiranNama = $namaFile;
+        $jenisLampiran = $file['type'][0]; // mime type
     }
 }
 
-header("Location: dashboard.php");
-exit;
+// Simpan ke database
+$stmt = $conn->prepare("INSERT INTO pengumuman (user_id, teks, lampiran, jenis_lampiran, created_at, bidang_id) VALUES (?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("issssi", $user_id, $teks, $lampiranNama, $jenisLampiran, $created_at, $bidang_id);
+
+if ($stmt->execute()) {
+    header("Location: dashboard.php");
+} else {
+    echo "Gagal menyimpan pengumuman: " . $stmt->error;
+}
+$stmt->close();
+$conn->close();
 ?>

@@ -61,45 +61,57 @@ if (!in_array($page, $valid_pages)) {
     <main class="flex-1 p-6 overflow-y-auto">
         <h2 class="text-2xl font-bold mb-4">📋 Dashboard Pelayanan</h2>
 
-        <?php if ($page == 'semua'): ?>
-            <h3 class="text-lg font-semibold mb-3">📌 Semua Tugas</h3>
-            <div class="bg-white p-4 rounded shadow">
-                <table class="w-full border border-gray-300 table-auto">
-                    <thead class="bg-gray-200">
-                        <tr>
-                            <th class="border px-3 py-2">Judul</th>
-                            <th class="border px-3 py-2">Nama Pegawai</th>
-                            <th class="border px-3 py-2">Kategori</th>
-                            <th class="border px-3 py-2">Deadline</th>
-                            <th class="border px-3 py-2">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $query = mysqli_query($conn, "
-                            SELECT t.judul, t.kategori, t.deadline, t.status, u.nama AS nama_pegawai
-                            FROM task t
-                            JOIN user u ON t.assigned_to = u.id
-                            JOIN bidang b ON u.bidang_id = b.id
-                            WHERE b.nama = 'Penanaman Modal'
-                            ORDER BY t.deadline ASC
-                        ");
-                        if (mysqli_num_rows($query) > 0):
-                            while ($row = mysqli_fetch_assoc($query)):
-                        ?>
-                        <tr class="text-center">
-                            <td class="border px-3 py-2"><?= htmlspecialchars($row['judul']) ?></td>
-                            <td class="border px-3 py-2"><?= htmlspecialchars($row['nama_pegawai']) ?></td>
-                            <td class="border px-3 py-2"><?= htmlspecialchars($row['kategori']) ?></td>
-                            <td class="border px-3 py-2"><?= htmlspecialchars($row['deadline']) ?></td>
-                            <td class="border px-3 py-2"><?= htmlspecialchars($row['status']) ?></td>
-                        </tr>
-                        <?php endwhile; else: ?>
-                        <tr><td colspan="5" class="text-center py-4">Tidak ada tugas</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+       <?php if ($page == 'semua'): ?>
+    <h3 class="text-lg font-semibold mb-3">📌 Semua Tugas</h3>
+    <div class="bg-white p-4 rounded shadow">
+        <table class="w-full border border-gray-300 table-auto">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="border px-3 py-2">Judul</th>
+                    <th class="border px-3 py-2">Nama Pegawai</th>
+                    <th class="border px-3 py-2">Kategori</th>
+                    <th class="border px-3 py-2">Deadline</th>
+                    <th class="border px-3 py-2">Status</th>
+                    <th class="border px-3 py-2">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $query = mysqli_query($conn, "
+                    SELECT t.id, t.judul, t.kategori, t.deadline, t.status, u.nama AS nama_pegawai
+                    FROM task t
+                    JOIN user u ON t.assigned_to = u.id
+                    JOIN bidang b ON u.bidang_id = b.id
+                    WHERE b.nama = 'Penaman Modal'
+                    ORDER BY t.deadline ASC
+                ");
+                if (mysqli_num_rows($query) > 0):
+                    while ($row = mysqli_fetch_assoc($query)):
+                ?>
+                <tr class="text-center">
+                    <td class="border px-3 py-2"><?= htmlspecialchars($row['judul']) ?></td>
+                    <td class="border px-3 py-2"><?= htmlspecialchars($row['nama_pegawai']) ?></td>
+                    <td class="border px-3 py-2"><?= htmlspecialchars($row['kategori']) ?></td>
+                    <td class="border px-3 py-2"><?= htmlspecialchars($row['deadline']) ?></td>
+                    <td class="border px-3 py-2"><?= htmlspecialchars($row['status']) ?></td>
+                    <td class="border px-3 py-2">
+                       <a href="edit_tugas.php?id=<?= $row['id'] ?>&redirect=<?= basename($_SERVER['PHP_SELF']) ?>" 
+                            class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">
+                            Edit
+                            </a>
+
+                        <a href="hapus_tugas.php?id=<?= urlencode($row['id']) ?>" 
+                           onclick="return confirm('Yakin mau hapus data ini?')" 
+                           class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Hapus</a>
+                    </td>
+                </tr>
+                <?php endwhile; else: ?>
+                <tr><td colspan="6" class="text-center py-4">Tidak ada tugas</td></tr>
+                <?php endif; ?> <!-- ✅ Tambahan untuk menutup if tugas -->
+            </tbody>
+        </table>
+    </div>
+
 
         <?php elseif ($page == 'orang'): ?>
             <h3 class="text-lg font-semibold mb-3">👤 Pegawai di Bidang Kesekretariatan</h3>
@@ -127,17 +139,20 @@ if (!in_array($page, $valid_pages)) {
             <h3 class="text-lg font-semibold mb-3">✅ Tugas Selesai</h3>
             <div class="bg-white p-4 rounded shadow">
                 <?php
-                $query = mysqli_query($conn, "
-                    SELECT judul, deadline 
+                 $query = mysqli_query($conn, "
+                    SELECT t.judul, t.deadline, u.nama AS nama_pegawai
                     FROM task t
-                    JOIN bidang b ON t.bidang_user = b.id
-                    WHERE b.nama = 'Penanaman Modal' AND t.status = 'selesai'
+                    JOIN user u ON t.assigned_to = u.id
+                    JOIN bidang b ON u.bidang_id = b.id
+                    WHERE b.nama = 'Penanaman Modal' 
+                    AND LOWER(t.status) = 'selesai'
                 ");
                 if (mysqli_num_rows($query) > 0):
                     while ($row = mysqli_fetch_assoc($query)):
                 ?>
                 <div class="p-3 border-b">
                     <strong><?= htmlspecialchars($row['judul']) ?></strong><br>
+                    Pegawai: <?= htmlspecialchars($row['nama_pegawai']) ?><br>
                     Deadline: <?= htmlspecialchars($row['deadline']) ?><br>
                     Status: <span class="text-green-600 font-bold">Selesai</span>
                 </div>

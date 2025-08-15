@@ -7,7 +7,7 @@ if (!isset($_GET['id'])) {
 }
 
 $pegawaiId = intval($_GET['id']); // sanitize ID
-$query = "SELECT judul, deskripsi, deadline, status FROM task WHERE assigned_to = '$pegawaiId' ORDER BY deadline ASC";
+$query = "SELECT id, judul, deskripsi, deadline, status FROM task WHERE assigned_to = '$pegawaiId' ORDER BY deadline ASC";
 $result = mysqli_query($conn, $query);
 
 if (mysqli_num_rows($result) > 0) {
@@ -25,10 +25,14 @@ if (mysqli_num_rows($result) > 0) {
                 </div>
                 <p class='mb-0 text-muted'>".htmlspecialchars($task['deskripsi'])."</p>
                 <small>Deadline: ".htmlspecialchars($task['deadline'])."</small>
+                <div class='mt-2 d-flex justify-content-end'>
+                    <a href='edit_task.php?id=".$task['id']."' class='btn btn-warning btn-sm me-2'>Edit</a>
+                    <a href='hapus_task.php?id=".$task['id']."' class='btn btn-danger btn-sm'
+                       onclick='return confirm(\"Yakin ingin menghapus tugas ini?\")'>Hapus</a>
+                </div>
               </li>";
     }
     echo "</ul>";
 } else {
     echo "<p class='text-muted'>Belum ada tugas untuk pegawai ini.</p>";
 }
-?>

@@ -9,12 +9,16 @@ if (!isset($_SESSION['user_id']) ) {
     exit;
 }
 // Ambil data permohonan tenggat
-$query = "SELECT dr.*, u.nama AS requested_by, t.deadline AS deadline_awal
-          FROM deadline_request dr
-          JOIN user u ON dr.user_id = u.id
-          JOIN task t ON dr.task_id = t.id
-          WHERE dr.status = 'dikerjakan'
-          ORDER BY dr.id DESC";
+$query = "SELECT dr.*, 
+       u.nama AS requested_by, 
+       t.deadline AS deadline_awal, 
+       t.judul AS judul_tugas
+FROM deadline_request dr
+JOIN user u ON dr.user_id = u.id
+JOIN task t ON dr.task_id = t.id
+WHERE dr.status in ('dikerjakan', 'selesai', 'terlambat')
+ORDER BY dr.id DESC";
+
 
 $result = mysqli_query($conn, $query);
 ?>
@@ -125,23 +129,27 @@ $result = mysqli_query($conn, $query);
 
             <table class="min-w-full bg-white rounded shadow-md">
                 <thead class="bg-gray-100 text-gray-800 font-semibold">
-                    <tr>
-                        <th class="py-2 px-4 border text-left">Nama Pegawai</th>
-                        <th class="py-2 px-4 border text-left">Deadline Awal</th>
-                        <th class="py-2 px-4 border text-left">Deadline Diminta</th>
-                        <th class="py-2 px-4 border text-left">Alasan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($row = mysqli_fetch_assoc($result)) { ?>
-                    <tr class="hover:bg-gray-100">
-                        <td class="py-2 px-4 border"><?= htmlspecialchars($row['requested_by']) ?></td>
-                        <td class="py-2 px-4 border"><?= htmlspecialchars($row['deadline_awal']) ?></td>
-                        <td class="py-2 px-4 border"><?= htmlspecialchars($row['requested_deadline']) ?></td>
-                        <td class="py-2 px-4 border"><?= htmlspecialchars($row['alasan']) ?></td>
-                    </tr>
-                    <?php } ?>
-                </tbody>
+    <tr>
+        <th class="py-2 px-4 border text-left">Nama Pegawai</th>
+        <th class="py-2 px-4 border text-left">Judul Tugas</th>
+        <th class="py-2 px-4 border text-left">Deadline Awal</th>
+        <th class="py-2 px-4 border text-left">Deadline Diminta</th>
+        <th class="py-2 px-4 border text-left">Alasan</th>
+    </tr>
+</thead>
+
+               <tbody>
+    <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+    <tr class="hover:bg-gray-100">
+        <td class="py-2 px-4 border"><?= htmlspecialchars($row['requested_by']) ?></td>
+        <td class="py-2 px-4 border"><?= htmlspecialchars($row['judul_tugas']) ?></td>
+        <td class="py-2 px-4 border"><?= htmlspecialchars($row['deadline_awal']) ?></td>
+        <td class="py-2 px-4 border"><?= htmlspecialchars($row['requested_deadline']) ?></td>
+        <td class="py-2 px-4 border"><?= htmlspecialchars($row['alasan']) ?></td>
+    </tr>
+    <?php } ?>
+</tbody>
+
             </table>
         </div>
 
