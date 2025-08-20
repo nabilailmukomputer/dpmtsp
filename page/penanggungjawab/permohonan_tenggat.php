@@ -7,7 +7,9 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Ambil data permohonan tenggat
+$user_id = $_SESSION['user_id'];
+
+// Ambil semua permohonan tenggat, biar PJ bisa lihat semuanya
 $query = "SELECT dr.*, 
        u.nama AS requested_by, 
        t.deadline AS deadline_awal, 
@@ -15,9 +17,7 @@ $query = "SELECT dr.*,
 FROM deadline_request dr
 JOIN user u ON dr.user_id = u.id
 JOIN task t ON dr.task_id = t.id
-WHERE dr.status in ('dikerjakan', 'selesai', 'terlambat')
-ORDER BY dr.id DESC
-";
+ORDER BY dr.id DESC";
 
 $result = mysqli_query($conn, $query);
 ?>
@@ -37,6 +37,7 @@ $result = mysqli_query($conn, $query);
                 <th class="py-2 px-4 border text-left">Deadline Awal</th>
                 <th class="py-2 px-4 border text-left">Deadline Diminta</th>
                 <th class="py-2 px-4 border text-left">Alasan</th>
+                <th class="py-2 px-4 border text-left">Status</th>
                 <th class="py-2 px-4 border text-left">Aksi</th>
             </tr>
         </thead>
@@ -48,10 +49,13 @@ $result = mysqli_query($conn, $query);
                     <td class="py-2 px-4 border"><?= htmlspecialchars($row['deadline_awal']) ?></td>
                     <td class="py-2 px-4 border"><?= htmlspecialchars($row['requested_deadline']) ?></td>
                     <td class="py-2 px-4 border"><?= htmlspecialchars($row['alasan']) ?></td>
+                    <td class="py-2 px-4 border"><?= htmlspecialchars($row['status']) ?></td>
                     <td class="py-2 px-4 border">
                         <?php if ($row['status'] == 'dikerjakan'): ?>
-                            <a href="proses_permohonan.php?id=<?= $row['id'] ?>&aksi=terima" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-700">Setujui</a>
-                            <a href="proses_permohonan.php?id=<?= $row['id'] ?>&aksi=tolak" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Tolak</a>
+                            <a href="proses_permohonan.php?id=<?= $row['id'] ?>&aksi=terima" 
+                               class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-700">Setujui</a>
+                            <a href="proses_permohonan.php?id=<?= $row['id'] ?>&aksi=tolak" 
+                               class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Tolak</a>
                         <?php else: ?>
                             <span class="text-gray-500">Selesai</span>
                         <?php endif; ?>

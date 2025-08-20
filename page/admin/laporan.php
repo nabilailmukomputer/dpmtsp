@@ -9,15 +9,16 @@ if (!isset($_SESSION['user_id']) ) {
 }
 
 // Ambil semua laporan harian
-$query = "SELECT dr.id,
-                 dr.tanggal,
-                 dr.file_lampiran,
+$query = "SELECT tu.id,
+                 tu.tanggal_update,
+                 tu.file_lampiran AS file,
                  u.nama AS nama_pegawai,
-                 t.judul AS judul_task
-          FROM daily_report dr
-          JOIN user u ON dr.user_id = u.id
-          JOIN task t ON dr.task_id = t.id
-          ORDER BY dr.tanggal DESC";
+                 t.judul AS judul_task,
+                 tu.status
+          FROM task_update tu
+          JOIN user u ON tu.user_id = u.id
+          JOIN task t ON tu.task_id = t.id
+          ORDER BY tu.tanggal_update DESC";
 
 $result = mysqli_query($conn, $query);
 ?>
@@ -145,8 +146,8 @@ $result = mysqli_query($conn, $query);
                     <tr class="hover:bg-gray-100">
                         <td class="py-2 px-4 border"><?= htmlspecialchars($row['nama_pegawai']) ?></td>
                         <td class="py-2 px-4 border"><?= htmlspecialchars($row['judul_task']) ?></td>
-                        <td class="py-2 px-4 border"><?= htmlspecialchars($row['tanggal']) ?></td>
-                        <td class="py-2 px-4 border"><?= nl2br(htmlspecialchars($row['file_lampiran'])) ?></td>
+                        <td class="py-2 px-4 border"><?= htmlspecialchars($row['tanggal_update']) ?></td>
+                        <td class="py-2 px-4 border"><?= nl2br(htmlspecialchars($row['file'])) ?></td>
                     </tr>
                     <?php } ?>
                 </tbody>

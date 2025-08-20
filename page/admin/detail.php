@@ -9,30 +9,30 @@ if (!isset($_SESSION['nama'])) {
 date_default_timezone_set('Asia/Jakarta');
 
 // ✅ Handler update status ke DB
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['status'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $sisa_waktu = isset($_POST['sisa_waktu']) ? intval($_POST['sisa_waktu']) : 0;
 
-    $sisa_waktu = isset($_POST['sisa_waktu']) ? intval($_POST['sisa_waktu']) : null;
-    $waktu_terlambat = isset($_POST['waktu_terlambat']) ? intval($_POST['waktu_terlambat']) : null;
+    $sql = "UPDATE task 
+            SET status='$status', sisa_waktu=$sisa_waktu 
+            WHERE id=$id";
 
-    if ($sisa_waktu !== null) {
-        $sql = "UPDATE task SET status='$status', sisa_waktu=$sisa_waktu, waktu_terlambat=NULL WHERE id=$id";
-    } elseif ($waktu_terlambat !== null) {
-        $sql = "UPDATE task SET status='$status', waktu_terlambat=$waktu_terlambat, sisa_waktu=NULL WHERE id=$id";
+    if (mysqli_query($conn, $sql)) {
+        echo "OK";
     } else {
-        $sql = "UPDATE task SET status='$status' WHERE id=$id";
+        echo "ERROR: " . mysqli_error($conn);
     }
-    mysqli_query($conn, $sql);
-    echo "OK";
     exit;
 }
+
+
 
 // =================== TAMPILAN LIST ===================
 $search = isset($_GET['q']) ? mysqli_real_escape_string($conn, $_GET['q']) : '';
 
 $query = "
-SELECT t.id, t.judul, t.deadline, t.tanggal_tugas, t.status, t.sisa_waktu, t.waktu_terlambat,
+SELECT t.id, t.judul, t.deadline, t.tanggal_tugas, t.status, t.sisa_waktu,
        u.nama AS penerima
 FROM task t
 JOIN user u ON t.assigned_to = u.id
@@ -122,25 +122,13 @@ while($row = mysqli_fetch_assoc($result)):
     $deadline = strtotime($row['deadline']);
     $assigned = strtotime($row['tanggal_tugas']);
     $total = max(1, $deadline - $assigned);
+if ($row['status'] === 'selesai') {
+    $remaining = (int)$row['sisa_waktu']; // bisa minus / plus
+} else {
+    $remaining = $deadline - time();
+    $row['status'] = ($remaining < 0) ? 'terlambat' : 'dikerjakan';
+}
 
-    if ($row['status'] === 'selesai') {
-        // pakai nilai yang sudah disimpan
-        if ($row['sisa_waktu'] !== null && $row['sisa_waktu'] !== '') {
-            $remaining = (int)$row['sisa_waktu'];
-        } elseif ($row['waktu_terlambat'] !== null && $row['waktu_terlambat'] !== '') {
-            $remaining = -(int)$row['waktu_terlambat'];
-        } else {
-            $remaining = 0;
-        }
-    } else {
-        // hitung live
-        $remaining = $deadline - time();
-        if ($remaining < 0) {
-            $row['status'] = 'terlambat'; // otomatis terlambat
-        } else {
-            $row['status'] = 'dikerjakan';
-        }
-    }
 ?>
 <tr class="text-center">
     <td class="border px-4 py-2"><?= htmlspecialchars($row['judul']) ?></td>
@@ -181,21 +169,24 @@ function kirimWaktuKeDB(id, remaining) {
   const data = new URLSearchParams();
   data.append("id", id);
   data.append("status", "selesai");
-  if (remaining >= 0) {
-    data.append("sisa_waktu", remaining);            // detik (INT)
-  } else {
-    data.append("waktu_terlambat", Math.abs(remaining)); // detik (INT)
-  }
+  data.append("sisa_waktu", remaining); // bisa negatif atau positif
 
-  return fetch(window.location.href, { method: "POST", body: data })
-    .then(res => res.text());
+  return fetch(window.location.href, { 
+      method: "POST", 
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: data 
+  }).then(res => res.text());
 }
+
+
 
 document.addEventListener("DOMContentLoaded", function () {
   const timers = document.querySelectorAll("[id^='timer-']");
 
   timers.forEach(timer => {
-    let remaining = parseInt(timer.dataset.remaining, 10);
+   let remaining = parseInt(timer.dataset.remaining, 10);
+if (isNaN(remaining)) remaining = 0; // fallback, biar gak null
+
     const total = parseInt(timer.dataset.total, 10);
     let status = (timer.dataset.status || "").toLowerCase();
     const id = timer.dataset.id;

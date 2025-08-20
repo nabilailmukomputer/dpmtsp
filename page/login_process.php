@@ -27,7 +27,7 @@ if ($data) {
         'penanggung jawab'   => 'penanggungjawab/dashboard.php',
         'pengendali teknis'  => 'pengendaliteknis/dashboard.php', // Ganti folder tanpa spasi
         'ketua divisi'       => 'ketuadivisi/dashboard.php',
-        'anggota'            => 'pegawai/permohonan_tenggat.php',
+        'anggota'            => 'pegawai/dashboard.php',
     ];
 
     $role = strtolower(trim($data['role']));

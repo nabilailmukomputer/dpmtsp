@@ -136,33 +136,37 @@ if (!in_array($page, $valid_pages)) {
             </div>
 
         <?php elseif ($page == 'selesai'): ?>
-            <h3 class="text-lg font-semibold mb-3">✅ Tugas Selesai</h3>
-            <div class="bg-white p-4 rounded shadow">
-                <?php
-                 $query = mysqli_query($conn, "
-                    SELECT t.judul, t.deadline, u.nama AS nama_pegawai
-                    FROM task t
-                    JOIN user u ON t.assigned_to = u.id
-                    JOIN bidang b ON u.bidang_id = b.id
-                    WHERE b.nama = 'Kesekretariatan' 
-                    AND LOWER(t.status) = 'selesai'
-                ");
-                if (mysqli_num_rows($query) > 0):
-                    while ($row = mysqli_fetch_assoc($query)):
-                ?>
-                <div class="p-3 border-b">
-                    <strong><?= htmlspecialchars($row['judul']) ?></strong><br>
-                    Pegawai: <?= htmlspecialchars($row['nama_pegawai']) ?><br>
-                    Deadline: <?= htmlspecialchars($row['deadline']) ?><br>
-                    Status: <span class="text-green-600 font-bold">Selesai</span>
-                </div>
-                <?php endwhile; else: ?>
-                <div class="text-center py-4">Tidak ada tugas selesai</div>
-                <?php endif; ?>
-            </div>
+    <h3 class="text-lg font-semibold mb-3">✅ Tugas Selesai</h3>
+    <div class="bg-white p-4 rounded shadow">
+        <?php
+         $query = mysqli_query($conn, "
+            SELECT t.id, t.judul, t.deadline, u.nama AS nama_pegawai
+            FROM task t
+            JOIN user u ON t.assigned_to = u.id
+            JOIN bidang b ON u.bidang_id = b.id
+            WHERE b.nama = 'Kesekretariatan' 
+            AND LOWER(t.status) = 'selesai'
+        ");
+        if (mysqli_num_rows($query) > 0):
+            while ($row = mysqli_fetch_assoc($query)):
+        ?>
+        <div class="p-3 border-b">
+            <strong><?= htmlspecialchars($row['judul']) ?></strong><br>
+            Pegawai: <?= htmlspecialchars($row['nama_pegawai']) ?><br>
+            Deadline: <?= htmlspecialchars($row['deadline']) ?><br>
+            Status: <span class="text-green-600 font-bold">Selesai</span><br>
+
+            <!-- Tombol Lihat Tugas -->
+            <a href="lihat_tugas.php?id=<?= $row['id'] ?>" 
+               class="inline-block mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+               📄 Lihat Tugas
+            </a>
+        </div>
+        <?php endwhile; else: ?>
+        <div class="text-center py-4">Tidak ada tugas selesai</div>
         <?php endif; ?>
-    </main>
-</div>
+    </div>
+<?php endif; ?>
 
 <script>
 const sidebar = document.getElementById('sidebar');

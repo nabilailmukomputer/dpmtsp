@@ -16,7 +16,6 @@ $query = "SELECT dr.*,
 FROM deadline_request dr
 JOIN user u ON dr.user_id = u.id
 JOIN task t ON dr.task_id = t.id
-WHERE dr.status in ('dikerjakan', 'selesai', 'terlambat')
 ORDER BY dr.id DESC";
 
 
