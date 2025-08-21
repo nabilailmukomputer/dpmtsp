@@ -15,19 +15,30 @@ $bidang = mysqli_fetch_assoc($q_bidang);
 $nama_bidang = $bidang['nama'];
 
 // Proses kirim pengumuman
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['teks'])) {
     $id_user = $_SESSION['user_id'];
     $teks = mysqli_real_escape_string($conn, $_POST['teks']);
 
-    $query = "INSERT INTO pengumuman (id_user, teks, created_at) 
-              VALUES ('$id_user', '$teks', NOW())";
+    $query = "INSERT INTO pengumuman (user_id, teks, bidang_id, created_at) 
+              VALUES ('$id_user', '$teks', '$bidang_id', NOW())";
 
-    if (mysqli_query($conn, $query)) {
-        header("Location: dashboard.php");
-        exit;
-    } else {
-        echo "Error: " . mysqli_error($conn);
-    }
+    mysqli_query($conn, $query);
+    header("Location: dashboard.php");
+    exit;
+}
+
+// Proses kirim komentar
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['komentar'], $_POST['id_pengumuman'])) {
+    $id_user = $_SESSION['user_id'];
+    $id_pengumuman = (int) $_POST['id_pengumuman'];
+    $konten = mysqli_real_escape_string($conn, $_POST['komentar']);
+
+    $query = "INSERT INTO komentar_pengumuman (id_pengumuman, user_id, komentar, created_at) 
+              VALUES ('$id_pengumuman', '$id_user', '$konten', NOW())";
+
+    mysqli_query($conn, $query);
+    header("Location: dashboard.php");
+    exit;
 }
 
 // Ambil semua pengumuman + user pembuat
@@ -39,16 +50,18 @@ $q_pengumuman = mysqli_query($conn, "
     ORDER BY p.created_at DESC
 ");
 
+
 $posts = [];
 while ($row = mysqli_fetch_assoc($q_pengumuman)) {
     $id_pengumuman = $row['id']; // ini ID dari tabel pengumuman
-    $q_komen = mysqli_query($conn, "
-        SELECT k.*, u.nama AS nama_user
-        FROM komentar_pengumuman k
-        JOIN user u ON k.user_id = u.id
-        WHERE k.tugas_id = '$id_pengumuman'
-        ORDER BY k.created_at ASC
-    ");
+   $q_komen = mysqli_query($conn, "
+    SELECT k.*, u.nama AS nama_user
+    FROM komentar_pengumuman k
+    JOIN user u ON k.user_id = u.id
+    WHERE k.id_pengumuman = '$id_pengumuman'
+    ORDER BY k.created_at ASC
+");
+
     $row['komentar'] = mysqli_fetch_all($q_komen, MYSQLI_ASSOC);
     $posts[] = $row;
 }
@@ -99,7 +112,7 @@ while ($row = mysqli_fetch_assoc($q_pengumuman)) {
         <div class="bg-white p-4 rounded-lg shadow-sm">
           <h3 class="text-sm font-semibold text-gray-700">Upcoming</h3>
           <p class="mt-3 text-sm text-gray-500">Woohoo, no work due soon!</p>
-          <a href="tugas.php" class="text-sm text-blue-600 mt-3 inline-block">View all</a>
+          <a href="ditugaskan.php" class="text-sm text-blue-600 mt-3 inline-block">View all</a>
         </div>
       </aside>
 
@@ -108,10 +121,11 @@ while ($row = mysqli_fetch_assoc($q_pengumuman)) {
         <!-- Tabs (Stream / Classwork / People) -->
         <nav class="bg-white rounded-lg shadow-sm px-4 py-3 flex items-center gap-4">
           <a href="dashboard.php" class="text-sm font-medium text-blue-600 border-b-2 border-blue-600 pb-1">Stream</a>
-          <a href="tugas.php" class="text-sm text-gray-600 hover:text-gray-800">Tugas</a>
-          <a href="bidang.php" class="text-sm text-gray-600 hover:text-gray-800">Anggota</a>
-          <a href="tenggat.php" class="text-sm text-gray-600 hover:text-gray-800">Permohonan Tenggat Waktu</a>
-          <div class="ml-auto text-sm text-gray-500">You are viewing as: <span class="ml-2 font-medium text-gray-700"><?= htmlspecialchars($_SESSION['nama'] ?? 'Ketua') ?></span></div>
+          <a href="ditugaskan.php" class="text-sm text-gray-600 hover:text-gray-800">Ditugaskan</a>
+          <a href="belum_diserahkan.php" class="text-sm text-gray-600 hover:text-gray-800">Dikerjakan</a>
+          <a href="selesai.php" class="text-sm text-gray-600 hover:text-gray-800">Selesai</a>
+         <!--<a href="tugas_harian.php" class="text-sm text-gray-600 hover:text-gray-800">Tugas Harian</a>-->
+          <div class="ml-auto text-sm text-gray-500">You are viewing as: <span class="ml-2 font-medium text-gray-700"><?= htmlspecialchars($_SESSION['nama'] ?? 'Pegawai') ?></span></div>
         </nav>
 
         <!-- Post composer -->
@@ -243,8 +257,8 @@ while ($row = mysqli_fetch_assoc($q_pengumuman)) {
                               <div class="flex items-start gap-3 py-2">
                                 <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-700"><?= strtoupper(substr($komen['nama_user'],0,1)) ?></div>
                                 <div class="flex-1">
-                                  <div class="text-sm"><span class="font-medium"><?= htmlspecialchars($komen['nama_user']) ?></span> <span class="text-gray-500 text-xs">· <?= date("d M Y H:i", strtotime($komen['tanggal'])) ?></span></div>
-                                  <div class="text-sm text-gray-700 mt-1"><?= htmlspecialchars($komen['konten']) ?></div>
+                                  <div class="text-sm"><span class="font-medium"><?= htmlspecialchars($komen['nama_user']) ?></span> <span class="text-gray-500 text-xs">· <?= date("d M Y H:i", strtotime($komen['created_at'])) ?></span></div>
+                                  <div class="text-sm text-gray-700 mt-1"><?= htmlspecialchars($komen['komentar']) ?></div>
                                 </div>
                               </div>
                               <?php endforeach; ?>

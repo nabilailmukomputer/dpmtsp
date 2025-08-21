@@ -12,7 +12,7 @@ date_default_timezone_set('Asia/Jakarta');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
-    $sisa_waktu = isset($_POST['sisa_waktu']) ? intval($_POST['sisa_waktu']) : 0;
+    $sisa_waktu = isset($_POST['sisa_waktu']) ? intval($_POST['sisa_waktu']) : null;
 
     $sql = "UPDATE task 
             SET status='$status', sisa_waktu=$sisa_waktu 
@@ -117,18 +117,40 @@ $result = mysqli_query($conn, $query);
                     </tr>
                 </thead>
                 <tbody>
-                   <?php
-while($row = mysqli_fetch_assoc($result)):
+    <?php
+    // Fungsi untuk memformat total detik menjadi HH:MM:SS dengan benar
+    function format_durasi($total_detik) {
+        $is_negative = $total_detik < 0;
+        $abs_detik = abs($total_detik);
+        $jam = floor($abs_detik / 3600);
+        $sisa = $abs_detik % 3600;
+        $menit = floor($sisa / 60);
+        $detik = $sisa % 60;
+        return ($is_negative ? "-" : "") . 
+               str_pad($jam, 2, "0", STR_PAD_LEFT) . ":" . 
+               str_pad($menit, 2, "0", STR_PAD_LEFT) . ":" . 
+               str_pad($detik, 2, "0", STR_PAD_LEFT);
+    }
+    $row_index = 0;
+    while($row = mysqli_fetch_assoc($result)):
     $deadline = strtotime($row['deadline']);
     $assigned = strtotime($row['tanggal_tugas']);
     $total = max(1, $deadline - $assigned);
-if ($row['status'] === 'selesai') {
-    $remaining = (int)$row['sisa_waktu']; // bisa minus / plus
-} else {
-    $remaining = $deadline - time();
-    $row['status'] = ($remaining < 0) ? 'terlambat' : 'dikerjakan';
-}
 
+    $display_status = $row['status'];
+
+    if ($row['status'] === 'selesai') {
+        $remaining = isset($row['sisa_waktu']) ? intval($row['sisa_waktu']) : 0;
+    } else {
+        $remaining = $deadline - time();
+        if ($remaining < 0) $display_status = 'terlambat';
+    }
+
+    // buat id unik per row: pakai task id + loop index
+    
+    $timer_id = "timer-{$row['id']}-{$row_index}";
+    $status_id = "status-{$row['id']}-{$row_index}";
+ 
 ?>
 <tr class="text-center">
     <td class="border px-4 py-2"><?= htmlspecialchars($row['judul']) ?></td>
@@ -136,24 +158,22 @@ if ($row['status'] === 'selesai') {
     <td class="border px-4 py-2"><?= htmlspecialchars($row['tanggal_tugas']) ?></td>
     <td class="border px-4 py-2"><?= htmlspecialchars($row['deadline']) ?></td>
     <td class="border px-4 py-2">
-        <span id="timer-<?= $row['id']; ?>"
-              class="timer-box text-white px-3 py-1 rounded"
-              data-remaining="<?= $remaining; ?>"
-              data-total="<?= $total; ?>"
-              data-id="<?= $row['id']; ?>"
-              data-status="<?= $row['status']; ?>">
-              <?= ($remaining < 0 ? '-' : '') . gmdate("H:i:s", abs($remaining)); ?>
-        </span>
+<span id="<?= $timer_id ?>"
+      class="timer-box text-white px-3 py-1 rounded"
+      data-remaining="<?= $remaining; ?>"
+      data-total="<?= $total; ?>"
+      data-id="<?= $row['id']; ?>"
+      data-status="<?= $display_status; ?>"
+      data-index="<?= $row_index ; ?>">
+    <?= format_durasi($remaining); ?>
+</span>
     </td>
-    <td id="status-<?= $row['id']; ?>" class="border px-4 py-2"><?= htmlspecialchars($row['status']) ?></td>
+    <td id="<?= $status_id ?>" class="border px-4 py-2"><?= htmlspecialchars($display_status) ?></td>
 </tr>
-<?php endwhile; ?>
+<?php $row_index++;
+endwhile; ?>
 
-                </tbody>
-            </table>
-        </div>
-    </main>
-</div>
+</tbody>
 
 <script>
 function updateTimerDisplay(timer, remaining) {
@@ -169,9 +189,9 @@ function kirimWaktuKeDB(id, remaining) {
   const data = new URLSearchParams();
   data.append("id", id);
   data.append("status", "selesai");
-  data.append("sisa_waktu", remaining); // bisa negatif atau positif
+  data.append("sisa_waktu", remaining);
 
-  return fetch(window.location.href, { 
+  return fetch("update_status.php", { 
       method: "POST", 
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: data 
@@ -180,74 +200,62 @@ function kirimWaktuKeDB(id, remaining) {
 
 
 
+
 document.addEventListener("DOMContentLoaded", function () {
-  const timers = document.querySelectorAll("[id^='timer-']");
+  const timers = document.querySelectorAll(".timer-box");
 
   timers.forEach(timer => {
-   let remaining = parseInt(timer.dataset.remaining, 10);
-if (isNaN(remaining)) remaining = 0; // fallback, biar gak null
+    let remaining = parseInt(timer.dataset.remaining, 10);
+    if (isNaN(remaining)) remaining = 0;
 
     const total = parseInt(timer.dataset.total, 10);
     let status = (timer.dataset.status || "").toLowerCase();
-    const id = timer.dataset.id;
+    const taskId = timer.dataset.id;
 
-    // helper: set warna sesuai state
+    const statusEl = document.getElementById(`status-${taskId}-${timer.dataset.index || 0}`);
+
     const applyColor = () => {
       let colorClass = "bg-green-600";
       if (status === "selesai") colorClass = "bg-blue-600";
-      else if (remaining < 0)  colorClass = "bg-gray-500";
+      else if (remaining < 0) colorClass = "bg-gray-500";
       else if (remaining <= total / 2) colorClass = "bg-red-500";
       timer.className = `timer-box ${colorClass} text-white px-3 py-1 rounded`;
     };
 
-    // Kalau sudah selesai dari server -> tampilkan & stop
     if (status === "selesai") {
       updateTimerDisplay(timer, remaining);
       applyColor();
       return;
     }
 
-    // Otherwise: jalanin countdown (termasuk minus kalau lewat deadline)
     const interval = setInterval(() => {
       remaining -= 1;
       updateTimerDisplay(timer, remaining);
 
-      // auto-label terlambat saat lewat deadline (tanpa mengubah fitur lain)
-      if (remaining < 0) {
-        const stEl = document.querySelector(`#status-${id}`);
-        if (stEl && stEl.textContent.toLowerCase() !== "selesai") {
-          stEl.textContent = "terlambat";
-        }
+      if (remaining < 0 && statusEl && statusEl.textContent.toLowerCase() !== "selesai") {
+        statusEl.textContent = "terlambat";
       }
       applyColor();
     }, 1000);
 
-    // Klik timer = set selesai, freeze nilai saat ini, kirim ke DB (positif / minus)
     timer.addEventListener("click", function () {
-      // Kalau sudah selesai, abaikan
       if (status === "selesai") return;
 
-      // Bekukan tampilan di nilai saat ini
       clearInterval(interval);
       status = "selesai";
       updateTimerDisplay(timer, remaining);
       applyColor();
-      const stEl = document.querySelector(`#status-${id}`);
-      if (stEl) stEl.textContent = "selesai";
+      if (statusEl) statusEl.textContent = "selesai";
 
-      // Update dataset biar konsisten
       timer.dataset.status = "selesai";
       timer.dataset.remaining = String(remaining);
 
-      // Simpan ke DB (tanpa reload). Kalau gagal, kita balikin ke state sebelumnya.
-      kirimWaktuKeDB(id, remaining).then(text => {
+      kirimWaktuKeDB(taskId, remaining).then(text => {
         if (text.trim() !== "OK") {
-          // rollback jika perlu (jarang kejadian, tapi aman)
-          status = (stEl?.textContent || "dikerjakan").toLowerCase();
+          status = (statusEl?.textContent || "dikerjakan").toLowerCase();
         }
       }).catch(() => {
-        // rollback sederhana kalau error jaringan
-        status = (stEl?.textContent || "dikerjakan").toLowerCase();
+        status = (statusEl?.textContent || "dikerjakan").toLowerCase();
       });
     });
   });

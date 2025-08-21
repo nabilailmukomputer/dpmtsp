@@ -1,31 +1,23 @@
 <?php
 include '../../db.php';
 session_start();
+date_default_timezone_set('Asia/Jakarta');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['status'])) {
     $id = intval($_POST['id']);
-    $status = $_POST['status'];
+    $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $sisa_waktu = isset($_POST['sisa_waktu']) ? intval($_POST['sisa_waktu']) : "NULL";
 
-    // ambil deadline
-    $sql = "SELECT deadline FROM task WHERE id=$id";
-    $res = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($res);
+    $sql = "UPDATE task 
+            SET status='$status', sisa_waktu=$sisa_waktu 
+            WHERE id=$id";
 
-    $deadline_ts = strtotime($row['deadline']);
-    $now = time();
-    $sisa_detik = $deadline_ts - $now;
-
-    if ($status === 'selesai') {
-        // simpan sisa detik terakhir (positif atau minus)
-        $update = "UPDATE task SET status='selesai', sisa_waktu=$sisa_detik WHERE id=$id";
-    } elseif ($status === 'terlambat') {
-        $update = "UPDATE task SET status='terlambat', sisa_waktu=$sisa_detik WHERE id=$id";
+    if (mysqli_query($conn, $sql)) {
+        echo "OK";
     } else {
-        $update = "UPDATE task SET status='dikerjakan', sisa_waktu=$sisa_detik WHERE id=$id";
+        echo "ERROR: " . mysqli_error($conn);
     }
-
-    mysqli_query($conn, $update);
+    exit;
 }
 
-header("Location: detail.php");
-exit;
+echo "INVALID";

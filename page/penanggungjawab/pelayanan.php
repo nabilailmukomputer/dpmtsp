@@ -96,9 +96,9 @@ if (!in_array($page, $valid_pages)) {
                     <td class="border px-3 py-2"><?= htmlspecialchars($row['status']) ?></td>
                     <td class="border px-3 py-2">
                         <a href="edit_tugas.php?id=<?= $row['id'] ?>&redirect=<?= basename($_SERVER['PHP_SELF']) ?>" 
-   class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">
-   Edit
-</a>
+                            class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">
+                            Edit
+                            </a>
 
                         <a href="hapus_tugas.php?id=<?= urlencode($row['id']) ?>" 
                            onclick="return confirm('Yakin mau hapus data ini?')" 
