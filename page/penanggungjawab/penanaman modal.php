@@ -14,6 +14,7 @@ $valid_pages = ['semua', 'orang', 'selesai'];
 if (!in_array($page, $valid_pages)) {
     $page = 'semua';
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -59,7 +60,7 @@ if (!in_array($page, $valid_pages)) {
 
     <!-- Main Content -->
     <main class="flex-1 p-6 overflow-y-auto">
-        <h2 class="text-2xl font-bold mb-4">📋 Dashboard Pelayanan</h2>
+        <h2 class="text-2xl font-bold mb-4">📋 Dashboard Penanaman Modal</h2>
 
        <?php if ($page == 'semua'): ?>
     <h3 class="text-lg font-semibold mb-3">📌 Semua Tugas</h3>
@@ -82,7 +83,7 @@ if (!in_array($page, $valid_pages)) {
                     FROM task t
                     JOIN user u ON t.assigned_to = u.id
                     JOIN bidang b ON u.bidang_id = b.id
-                    WHERE b.nama = 'Penaman Modal'
+                    WHERE b.nama = 'Penanaman Modal'
                     ORDER BY t.deadline ASC
                 ");
                 if (mysqli_num_rows($query) > 0):
@@ -114,7 +115,7 @@ if (!in_array($page, $valid_pages)) {
 
 
         <?php elseif ($page == 'orang'): ?>
-            <h3 class="text-lg font-semibold mb-3">👤 Pegawai di Bidang Kesekretariatan</h3>
+            <h3 class="text-lg font-semibold mb-3">👤 Pegawai di Bidang Penanaman Modal</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <?php
                 $query = mysqli_query($conn, "
@@ -140,13 +141,14 @@ if (!in_array($page, $valid_pages)) {
             <div class="bg-white p-4 rounded shadow">
                 <?php
                  $query = mysqli_query($conn, "
-                    SELECT t.judul, t.deadline, u.nama AS nama_pegawai
-                    FROM task t
-                    JOIN user u ON t.assigned_to = u.id
-                    JOIN bidang b ON u.bidang_id = b.id
-                    WHERE b.nama = 'Penanaman Modal' 
-                    AND LOWER(t.status) = 'selesai'
-                ");
+    SELECT t.id, t.judul, t.deadline, u.nama AS nama_pegawai
+    FROM task t
+    JOIN user u ON t.assigned_to = u.id
+    JOIN bidang b ON u.bidang_id = b.id
+    WHERE b.nama = 'Penanaman Modal' 
+    AND LOWER(t.status) = 'selesai'
+");
+
                 if (mysqli_num_rows($query) > 0):
                     while ($row = mysqli_fetch_assoc($query)):
                 ?>
@@ -155,14 +157,17 @@ if (!in_array($page, $valid_pages)) {
                     Pegawai: <?= htmlspecialchars($row['nama_pegawai']) ?><br>
                     Deadline: <?= htmlspecialchars($row['deadline']) ?><br>
                     Status: <span class="text-green-600 font-bold">Selesai</span>
+                    <!-- Tombol Lihat Tugas -->
+                    <a href="lihat_tugas.php?id=<?= $row['id'] ?>" 
+                       class="inline-block mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                       📄 Lihat Tugas
+                    </a>
                 </div>
-                <?php endwhile; else: ?>
-                <div class="text-center py-4">Tidak ada tugas selesai</div>
-                <?php endif; ?>
-            </div>
+        <?php endwhile; else: ?>
+        <div class="text-center py-4">Tidak ada tugas selesai</div>
         <?php endif; ?>
-    </main>
-</div>
+    </div>
+<?php endif; ?>
 
 <script>
 const sidebar = document.getElementById('sidebar');

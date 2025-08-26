@@ -1,24 +1,24 @@
 <?php
 include '../../db.php';
-session_start();
 
-if (!isset($_GET['id'])) die("ID tugas tidak ditemukan.");
 
-$id = intval($_GET['id']);
+if (isset($_GET['id'])) {
+    $id = intval($_GET['id']);
+    $stmt = $conn->prepare("SELECT file_name, file_type, file_lampiran FROM task_update WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->store_result();
+    $stmt->bind_result($file_name, $file_type, $file_data);
+    $stmt->fetch();
 
-$q = mysqli_query($conn, "SELECT file_lampiran FROM task_update WHERE id = $id");
-$row = mysqli_fetch_assoc($q);
-
-if (!$row) die("File tidak ditemukan di database.");
-
-// header untuk download
-header('Content-Description: File Transfer');
-header('Content-Type: application/octet-stream');
-header('Content-Disposition: attachment; filename="task_'.$id.'"');
-header('Expires: 0');
-header('Cache-Control: must-revalidate');
-header('Pragma: public');
-header('Content-Length: ' . strlen($row['file_lampiran']));
-
-echo $row['file_lampiran'];
-exit;
+    if ($file_data) {
+        header("Content-Type: " . $file_type);
+        header("Content-Disposition: attachment; filename=\"" . $file_name . "\"");
+        header("Content-Length: " . strlen($file_data));
+        echo $file_data;
+        exit;
+    } else {
+        echo "File tidak ditemukan.";
+    }
+}
+?>

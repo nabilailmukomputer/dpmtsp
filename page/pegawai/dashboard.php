@@ -72,7 +72,7 @@ while ($row = mysqli_fetch_assoc($q_pengumuman)) {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard Ketua Divisi - <?= htmlspecialchars($nama_bidang ?? 'Bidang') ?></title>
+  <title>Dashboard Pegawai - <?= htmlspecialchars($nama_bidang ?? 'Bidang') ?></title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>

@@ -120,10 +120,10 @@ while ($row = mysqli_fetch_assoc($q_pengumuman)) {
       <main class="lg:col-span-2">
         <!-- Tabs (Stream / Classwork / People) -->
         <nav class="bg-white rounded-lg shadow-sm px-4 py-3 flex items-center gap-4">
-          <a href="dashboard.php" class="text-sm font-medium text-blue-600 border-b-2 border-blue-600 pb-1">Stream</a>
-          <a href="ditugaskan.php" class="text-sm text-gray-600 hover:text-gray-800">Ditugaskan</a>
-          <a href="belum_diserahkan.php" class="text-sm text-gray-600 hover:text-gray-800">Dikerjakan</a>
-          <a href="selesai.php" class="text-sm text-gray-600 hover:text-gray-800">Selesai</a>
+          <a href="dashboard.php" class="text-sm font-medium text-gray-600 hover:text-gray-900">Stream</a>
+    <a href="tugas.php" class="text-sm font-medium text-gray-600 hover:text-gray-900">Tugas</a>
+    <a href="bidang.php" class="text-sm font-medium text-green-700 border-b-2 border-green-700 pb-1">Anggota</a>
+    <a href="tenggat.php" class="text-sm font-medium text-gray-600 hover:text-gray-900">Permohonan Tenggat Waktu</a>
          <!--<a href="tugas_harian.php" class="text-sm text-gray-600 hover:text-gray-800">Tugas Harian</a>-->
           <div class="ml-auto text-sm text-gray-500">You are viewing as: <span class="ml-2 font-medium text-gray-700"><?= htmlspecialchars($_SESSION['nama'] ?? 'Pegawai') ?></span></div>
         </nav>

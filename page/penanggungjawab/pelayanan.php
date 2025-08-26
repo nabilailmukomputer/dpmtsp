@@ -156,14 +156,17 @@ if (!in_array($page, $valid_pages)) {
                     Pegawai: <?= htmlspecialchars($row['nama_pegawai']) ?><br>
                     Deadline: <?= htmlspecialchars($row['deadline']) ?><br>
                     Status: <span class="text-green-600 font-bold">Selesai</span>
-                </div>
-                <?php endwhile; else: ?>
-                <div class="text-center py-4">Tidak ada tugas selesai</div>
-                <?php endif; ?>
-            </div>
+                    <!-- Tombol Lihat Tugas -->
+            <a href="lihat_tugas.php?id=<?= $row['id'] ?>" 
+               class="inline-block mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+               📄 Lihat Tugas
+            </a>
+        </div>
+        <?php endwhile; else: ?>
+        <div class="text-center py-4">Tidak ada tugas selesai</div>
         <?php endif; ?>
-    </main>
-</div>
+    </div>
+<?php endif; ?>
 <script>
 const sidebar = document.getElementById('sidebar');
 const toggleBtn = document.getElementById('toggle-btn');
